@@ -1,5 +1,6 @@
-# AED Trabalho 03-2017
-TODO Descrição do **trabalho 3**
+# AED Trabalho 03
+
+Demonstração referente a uma estrutura avançada de dados que utilize o conceito de árvores.
 
 #### Autores:
 - Almir Braggio
