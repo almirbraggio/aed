@@ -1,0 +1,16 @@
+S0, 890, Almir Braggio
+E3
+P0
+88, Circuitos Eletricos, Mathew Sadiku
+--
+S1, 987, Guilherme Zat
+E0
+P2
+24, A Arvore Que Dava Dinheiro, Domingos Pellegrini
+--
+S2, 162, Dabit Sonoda
+E3
+P0
+1, A Ilha Perdida, Maria Jose Dupre
+2, Eramos Seis, Maria Jose Dupre
+
