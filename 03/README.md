@@ -1,4 +1,4 @@
-# AED Trabalho 03
+# AED Trabalho 03: Árvores
 
 Demonstração referente a uma estrutura avançada de dados que utilize o conceito de árvores.
 

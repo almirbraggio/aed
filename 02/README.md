@@ -1,6 +1,6 @@
-# AED Trabalho 02
+# AED Trabalho 02: Universidade
 
-Trata-se de um programa para gerenciar o cadastro de alunos de uma Universidade utilizando árvore do tipo B.
+Trata-se de um programa para gerenciar o cadastro de alunos de uma Universidade utilizando árvores do tipo B.
 
 #### Autores:
 - Almir Braggio
