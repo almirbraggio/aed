@@ -17,11 +17,12 @@ typedef struct bintree_node {
 } bintree_node_t;
 
 typedef struct bintree {
-    size_t size;
-    struct bintree_node *root;
+    size_t 	size;
+	char 	*info;
+    struct 	bintree_node *root;
 } bintree_t;
 
-bintree_t *init_bintree (size_t size);
+bintree_t *init_bintree (size_t size, char *info);
 
 bintree_t *free_bintree (bintree_t *tree);
 bintree_node_t *free_node_bintree (bintree_node_t *node);
