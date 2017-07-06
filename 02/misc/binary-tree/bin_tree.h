@@ -4,6 +4,7 @@
 #ifndef BIN_TREE_H_INCLUDED
 #define BIN_TREE_H_INCLUDED
 
+#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
@@ -11,20 +12,30 @@
 #define NULL    (0)
 #endif
 
+#define UNUSED(x) (void)(x)
+
+typedef unsigned int data_t;
+
 typedef struct bintree_node {
-    void 	*data;
-    struct 	bintree_node *left, *right;
+	data_t data;
+	struct bintree_node *left, *right;
 } bintree_node_t;
 
 typedef struct bintree {
-    size_t 	size;
-	char 	*info;
-    struct 	bintree_node *root;
+	struct bintree_node *root;
 } bintree_t;
 
-bintree_t *init_bintree (size_t size, char *info);
+// init
+bintree_t *init_bintree (void);
+bintree_node_t *init_node_bintree (void);
 
-bintree_t *free_bintree (bintree_t *tree);
-bintree_node_t *free_node_bintree (bintree_node_t *node);
+// free
+void free_bintree (bintree_t *tree);
+void free_node_bintree (bintree_node_t *node);
+
+// prints
+void preorder_bintree(bintree_node_t *node);
+void inorder_bintree(bintree_node_t *node);
+void postorder_bintree(bintree_node_t *node);
 
 #endif

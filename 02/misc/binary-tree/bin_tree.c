@@ -3,72 +3,61 @@
 
 #include "bin_tree.h"
 
-#define MAX_STR		32
-
-// init binary tree
-bintree_t *init_bintree(size_t size, char *info) {
-    bintree_t *ptr = (bintree_t *)malloc(sizeof(bintree_t));
-    char *str = (char *)calloc(1,MAX_STR);
-
-    if (ptr == NULL)
-        exit(EXIT_FAILURE);
-
-    if (str == NULL)
-        exit(EXIT_FAILURE);
-
-    memcpy(str, (const void *)info, MAX_STR);;
-
-    // init tree
-    ptr->size = size;
-    ptr->root = NULL;
-    ptr->info = str;    
-
-    return (bintree_t *)ptr;
+// init
+bintree_t *init_bintree (void) {
+	bintree_t *tree = (bintree_t *)malloc(sizeof(bintree_t));
+	tree->root = NULL;
+	return tree;
 }
 
-// free binary tree from root
-bintree_t *free_bintree(bintree_t *tree) {
-	if (tree) {
-		bintree_node_t *ptr = tree->root;
-        ptr = free_node_bintree(ptr);
-        // free char field
-        free(tree->info);
-		free(tree);
+bintree_node_t *init_node_bintree (void) {
+	bintree_node_t *node = (bintree_node_t *)malloc(sizeof(bintree_node_t));
+	node->left = node->right = NULL;
+	return node;
+}
+
+// free
+void free_bintree (bintree_t *tree) {
+	if (tree == NULL)
+		return;
+	free_node_bintree(tree->root);
+	free(tree);
+	return;
+}
+
+void free_node_bintree (bintree_node_t *node) {
+	if (node == NULL)
+		return;
+	free_node_bintree(node->left);
+	free_node_bintree(node->right);
+	free(node);
+	return;
+}
+
+// prints
+void preorder_bintree(bintree_node_t *node) {
+	if (node != NULL) {
+		printf("%d ", node->data);
+		preorder_bintree(node->left);
+		preorder_bintree(node->right);
 	}
-	return (bintree_t *)NULL;
+	return;
 }
 
-// free binary tree from node
-bintree_node_t *free_node_bintree(bintree_node_t *node) {
-	if (node) {
-		node->left = free_node_bintree(node->left);
-		node->right = free_node_bintree(node->right);
-		free(node);
+void inorder_bintree(bintree_node_t *node) {
+	if (node){
+		inorder_bintree(node->left);
+		printf("%d ", node->data);
+		inorder_bintree(node->right);
 	}
-	return (bintree_node_t *)NULL;
+	return;
 }
 
-//bintree_node_t* insert_new_node_bintree(bintree_node_t *node, size_t size, void *data)
-
-
-// inserte a new node in the tree
-bintree_node_t* insert_new_bintree(bintree_node_t *node, size_t size, void *data) {
-	if (!node) {
-		bintree_node *new = (binTree*)calloc(1, sizeof(binTree));
-		new->data = key;
-		new->left = NULL;
-		new->right = NULL;
-		return new;
+void postorder_bintree(bintree_node_t *node) {
+	if (node){
+		postorder_bintree(node->left);
+		postorder_bintree(node->right);
+		printf("%d ", node->data);
 	}
-	else if(->key > key){
-tree->left = insertNode(tree->left, key);
-return tree;
-}
-else if(tree->key < key){
-tree->right = insertNode(tree->right, key);
-return tree;
-}
-else{
-return tree;
-}
+	return;
 }

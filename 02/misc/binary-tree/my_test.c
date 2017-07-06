@@ -16,7 +16,7 @@ void print_bintree(bintree_t *tree);
 // Main code
 int main(int argc, char *argv[]) {
 	unsigned int i = 0, aux = 0;
-	bintree_t *root = NULL;
+	bintree_t *tree = init_bintree();
 
 	// Argument validation	
 	if ((argc >> 1) == 0) {
@@ -25,13 +25,12 @@ int main(int argc, char *argv[]) {
 	}
 
 	// One argument, then insert random data
-	if ((argc >> 1) == 1) {
+	/*if ((argc >> 1) == 1) {
 		aux = (unsigned int)atoi(argv[1]);
 		srand((unsigned)time(NULL));
 		for(i = 0; i < aux; i++) {
 			unsigned int x = (unsigned int)(rand() % aux);
-			if (i == 0)	root = init_bintree((data_t)x);
-			root = insert_bintree(root, (data_t)x);
+			tree->root = insert_bintree(tree, x);
 		}
 	}
 	// More arguments, then insert values
@@ -41,19 +40,16 @@ int main(int argc, char *argv[]) {
 			unsigned int x = (unsigned int)(atoi(argv[i]));
 			root = insert_bintree(root, (data_t)x);
 		}
-	}
+	}*/
 
 	// Print tree (pre, in, post order)
-	print_bintree(root);
+	print_bintree(tree);
 
 	// Delete tree
-	free_bintree(root);
-	if (!root) {
-		printf("Binary Tree deleted!\r\n");
+	free_bintree(tree);
+	if (tree->root == NULL) {
+		printf("Tree deleted!\r\n");
 	}
-
-	// Prints
-	print_bintree(root);
 
 	printf("Exiting!\r\n");
 	return 0;
@@ -61,15 +57,15 @@ int main(int argc, char *argv[]) {
 
 void print_bintree(bintree_t *tree) {
 	printf("Pre Order:\r\n");
-	printpre_bintree(tree);
+	preorder_bintree(tree->root);
 	printf("\r\n");
 
 	printf("In Order:\r\n");
-	printin_bintree(tree);
+	inorder_bintree(tree->root);
 	printf("\r\n");
 
 	printf("Post Order:\r\n");
-	printpost_bintree(tree);
+	postorder_bintree(tree->root);
 	printf("\r\n");
 
 	return;
