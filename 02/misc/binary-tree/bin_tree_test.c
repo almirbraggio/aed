@@ -11,12 +11,15 @@
 #define NULL	(0)
 #endif
 
-void print_bintree(bintree_t *tree);
+// use for check seg faults and memory leaks
+// valgrind --leak-check=full ./bin_tree
+
+void print_bintree(bintree_t r);
 
 // Main code
 int main(int argc, char *argv[]) {
 	unsigned int i = 0, aux = 0;
-	bintree_t *tree = init_bintree();
+	bintree_t tree = init_bintree();
 
 	// Argument validation	
 	if ((argc >> 1) == 0) {
@@ -25,48 +28,49 @@ int main(int argc, char *argv[]) {
 	}
 
 	// One argument, then insert random data
-	/*if ((argc >> 1) == 1) {
+	if ((argc >> 1) == 1) {
 		aux = (unsigned int)atoi(argv[1]);
 		srand((unsigned)time(NULL));
 		for(i = 0; i < aux; i++) {
 			unsigned int x = (unsigned int)(rand() % aux);
-			tree->root = insert_bintree(tree, x);
+			tree = insert_bintree(tree, x);
 		}
 	}
 	// More arguments, then insert values
 	else {
-		root = init_bintree((data_t)atoi(argv[1]));
-		for(i = 2; i < argc; i++) {
+		for(i = 1; i < argc; i++) {
 			unsigned int x = (unsigned int)(atoi(argv[i]));
-			root = insert_bintree(root, (data_t)x);
+			tree = insert_bintree(tree, (data_t)x);
 		}
-	}*/
+	}
 
 	// Print tree (pre, in, post order)
 	print_bintree(tree);
 
 	// Delete tree
-	free_bintree(tree);
-	if (tree->root == NULL) {
-		printf("Tree deleted!\r\n");
+	tree = free_bintree(tree);
+
+	if (isempty_bintree(tree)) {
+		printf("Tree is empty!\r\n");
 	}
 
 	printf("Exiting!\r\n");
 	return 0;
 }
 
-void print_bintree(bintree_t *tree) {
+// Prints
+void print_bintree(bintree_t r) {
+	// pre
 	printf("Pre Order:\r\n");
-	preorder_bintree(tree->root);
+	preorder_bintree(r);
 	printf("\r\n");
-
+	// in
 	printf("In Order:\r\n");
-	inorder_bintree(tree->root);
+	inorder_bintree(r);
 	printf("\r\n");
-
+	// post
 	printf("Post Order:\r\n");
-	postorder_bintree(tree->root);
+	postorder_bintree(r);
 	printf("\r\n");
-
 	return;
 }
