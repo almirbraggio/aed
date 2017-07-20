@@ -1,7 +1,7 @@
 // Author: Almir Braggio
 // jun. 2017
 
-#include "bin_tree.h"
+#include "src/btree.h"
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -14,11 +14,13 @@
 // use for check seg faults and memory leaks
 // valgrind --leak-check=full ./bin_tree
 
-void print_bintree(bintree_t r);
+//void print_bintree(bintree_t r);
 
 // Main code
 int main(int argc, char *argv[]) {
-	unsigned int i = 0, aux = 0;
+	btree_t *root = init_btree();
+
+	/*unsigned int i = 0, aux = 0;
 	bintree_t tree = init_bintree();
 
 	// Argument validation	
@@ -53,11 +55,12 @@ int main(int argc, char *argv[]) {
 	if (isempty_bintree(tree)) {
 		printf("Tree is empty!\r\n");
 	}
-
+*/
 	printf("Exiting!\r\n");
 	return 0;
 }
 
+/*
 // Prints
 void print_bintree(bintree_t r) {
 	// pre
@@ -74,3 +77,4 @@ void print_bintree(bintree_t r) {
 	printf("\r\n");
 	return;
 }
+*/

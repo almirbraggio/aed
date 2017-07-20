@@ -1,36 +1,43 @@
 // Author: Almir Braggio
-// jun. 2017
+// jul. 2017
 
-#ifndef BIN_TREE_H_INCLUDED
-#define BIN_TREE_H_INCLUDED
+#ifndef BTREE_H_INCLUDED
+#define BTREE_H_INCLUDED
 
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
-#ifndef NULL
-#define NULL    (0)
-#endif
+#include "bool.h"
+#include "util.h"
 
-#ifndef bool_t
-#define bool_t 	unsigned char
-#define true	1
-#define false	0
-#endif
+// ---
 
-#define UNUSED(x) (void)(x)
+#define M 	4
 
-typedef unsigned int data_t;
-typedef struct bintree_node_t *bintree_t;
+typedef unsigned int uint;
 
-struct bintree_node_t {
-	data_t data;
-	bintree_t left, right;
+typedef struct btree_node_t {
+    uint n; 			// keys in node
+    uint keys[M-1]; 	// array of keys
+    struct btree_node_t *p[M]; 			// pointers will be in use
+} btree_t;
+
+enum key_status {
+	Duplicate, 
+	Search_Failure,
+	Success,
+	Insert_It,
+	Less_Keys 
 };
 
-// init
-bintree_t init_bintree (void);
+// ---
 
+// init
+btree_t *init_btree (void);
+
+
+/*
 // free
 bintree_t free_bintree (bintree_t node);
 
@@ -48,5 +55,5 @@ data_t max_bintree (bintree_t node);
 void preorder_bintree(bintree_t node);
 void inorder_bintree(bintree_t node);
 void postorder_bintree(bintree_t node);
-
+*/
 #endif
