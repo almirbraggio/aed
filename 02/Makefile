@@ -1,3 +1,6 @@
-all: b_tree
+all:
+		rm -f btree
+		gcc -o btree main.c btree.c btree.h
 
-b_tree: main.c bin_tree.c bin_tree.h
+clean:
+		rm -f btree
