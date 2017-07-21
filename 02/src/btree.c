@@ -16,7 +16,8 @@ bool_t insert_btree (btree_t **node, uint key) {
 	enum key_status status = status_btree((*node), key, &up_key, &new_node);
 	// duplicate key
 	if (status == Duplicate) {
-		printf("Key already available\n");
+		//printf("Key already available\n");
+		return (bool_t)false;
 	}
 	// new node
 	else if (status == Insert_It) {
@@ -26,9 +27,9 @@ bool_t insert_btree (btree_t **node, uint key) {
 		(*node)->keys[0] = up_key;
 		(*node)->p[0] = up_root;
 		(*node)->p[1] = new_node;
-		return true;
+		return (bool_t)true;
 	}
-	return false;
+	return (bool_t)false;
 }
 
 // status
@@ -162,6 +163,61 @@ void inorder_btree (btree_t *node) {
 		}
 	}
 	return;
+}
+
+// total keys
+int total_btree (btree_t *node) {
+	int count = 0, i = 0;
+	if (!isempty_btree(node)) {
+		count = 1;
+		if ((node->n) >= 1) {
+			for (i = 0; i < ((M/2)+1); i++) {
+				count += total_btree(node->p[i]);
+			}
+			if ((node->n) == 2) {
+				count += total_btree(node->p[2]) + 1;
+			}
+		}
+	}
+	return count;
+}
+
+// min key
+uint min_btree (btree_t *node) {
+	uint min = 0;
+	if (!isempty_btree(node)) {
+		if (node->p[0] != NULL) {
+			min = min_btree(node->p[0]);
+		}
+		else {
+			min = node->keys[0];
+		}
+	}
+	return min;
+}
+
+// max key
+uint max_btree (btree_t *node) {
+	uint max = 0;
+	if (!isempty_btree(node)) {
+		if ((node->n) == 1) {
+			if ((node->p[1]) != NULL) {
+				max = max_btree(node->p[1]);
+			}
+			else {
+				max = node->keys[0];
+			}
+		}
+		if ((node->n) == 2) {
+			if ((node->p[2]) != NULL) {
+				max = max_btree(node->p[2]);
+			}
+			else {
+				max = node->keys[1];
+			}
+		}
+	}
+	return max;
 }
 
 

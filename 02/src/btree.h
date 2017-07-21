@@ -4,15 +4,15 @@
 #ifndef BTREE_H_INCLUDED
 #define BTREE_H_INCLUDED
 
+#include "useful.h"
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
-#include "useful.h"
-
 // ---
 
-#define M 	4
+#define M 	3
 
 typedef unsigned int uint;
 typedef enum key_status key_status_t;
@@ -54,6 +54,12 @@ bool_t isempty_btree (btree_t *node);
 // print in sorted order
 void inorder_btree (btree_t *node);
 
+// total keys
+int total_btree (btree_t *node);
+
+// min and max key
+uint min_btree (btree_t *node);
+uint max_btree (btree_t *node);
 
 
 

@@ -1,11 +1,15 @@
 // Author: Almir Braggio
 // jun. 2017
 
+#include "src/useful.h"
 #include "src/btree.h"
 
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
+
+//#define DBG
+#define TEST		9
 
 #define isempty(x) 	isempty_btree(x)
 
@@ -17,21 +21,35 @@
 // Main code
 int main(int argc, char *argv[]) {
 	btree_t *root = init_btree();
+	int i = 0, aux = 0;
+	bool_t status = false;
 
+#ifdef DBG
 	if (isempty(root) == true)
-		printf("B-Tree is empty.\r\n");
+		printf("\r\nB-Tree is empty.\r\n");
+#endif
 
-	insert_btree(&root, 6);
-	insert_btree(&root, 1);
-	insert_btree(&root, 4);
-	insert_btree(&root, 3);
-	insert_btree(&root, 2);
-	insert_btree(&root, 5);
+	printf("\r\nInit:\r\n");
+	srand((unsigned)time(NULL));
+	for (i = 0; i < TEST; i++) {
+		aux = (int)(rand() % 100);
+		status = insert_btree(&root, (uint)aux);
+		// TODO: verificar status true/false
+		//if (status == true)
+		printf("%d ", aux);
+	}
 
+#ifdef DBG
 	if (isempty(root) == false)
-		printf("B-Tree is not empty.\r\n");
+		printf("\r\nB-Tree is not empty.\r\n");
+#endif
 
+	printf("\r\nSorted:\r\n");
 	inorder_btree(root);
+
+	printf("\r\nStatus:\r\n");
+	printf("Min = %d\tMax = %d\tTotal = %d\r\n", 
+	(int)min_btree(root), (int)max_btree(root), total_btree(root));
 
 	/*unsigned int i = 0, aux = 0;
 	bintree_t tree = init_bintree();
