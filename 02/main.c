@@ -67,7 +67,7 @@ int main(int argc, char *argv[]) {
 	println("Tree:\t");
 	printall_btree(root,0);
 
-	println("Exiting!");
+	println("Exiting!\r\n");
 	return 0;
 }
 

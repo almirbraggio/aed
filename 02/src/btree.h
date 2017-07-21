@@ -38,32 +38,26 @@ enum key_status {
 // init
 btree_t *init_btree (void);
 
+// TODO: free
+
 // insert
 bool_t insert_btree (btree_t **node, uint key);
-
-// status
 key_status_t status_btree (btree_t *ptr, uint key, uint *up_key, btree_t **new_node);
 
-// search
+// search and search position
 bool_t search_btree (btree_t *node, uint key);
-
-// search position
 int search_pos_btree (uint key, uint *key_arr, uint n);
 
 // empty
 bool_t isempty_btree (btree_t *node);
 
-// print in sorted order
+// prints
 void inorder_btree (btree_t *node);
-
-// print all btree
 void printall_btree (btree_t *node, int tabs);
 
-// total keys
-int total_btree (btree_t *node);
-
-// min and max key
+// min, max and total
 uint min_btree (btree_t *node);
 uint max_btree (btree_t *node);
+int total_btree (btree_t *node);
 
 #endif
