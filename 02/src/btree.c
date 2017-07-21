@@ -178,6 +178,23 @@ void inorder_btree (btree_t *node) {
 	return;
 }
 
+// print all btree
+void printall_btree (btree_t *node, int tabs) {
+	int i;
+	if (!isempty_btree(node)) {
+		for(i = 1; i <= tabs; i++) {
+			printf("\t");
+		}
+		for (i = 0; i < (node->n); i++) {
+			printf("%d ",node->keys[i]);
+		}
+		printf("\n");
+		for (i=0; i <= (node->n); i++) {
+			printall_btree(node->p[i], tabs+1);
+		}
+	}
+}
+
 // total keys
 int total_btree (btree_t *node) {
 	int count = 0, i = 0;

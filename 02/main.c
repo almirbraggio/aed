@@ -39,6 +39,7 @@ int main(int argc, char *argv[]) {
 		println("B-Tree is empty.");
 #endif
 
+	// random input
 	println("Input:\t");
 	srand((unsigned)time(NULL));
 	for (i = 0; i < TEST; i++) {
@@ -54,12 +55,17 @@ int main(int argc, char *argv[]) {
 		println("B-Tree is not empty.");
 #endif
 
+	// output in order
 	println("Output:\t");
 	inorder_btree(root);
 
 	println("Status:");
 	println("\tMin %d < Max %d", (int)min_btree(root), (int)max_btree(root));
 	println("\tTotal = %d", total_btree(root));
+
+	// print with tabs
+	println("Tree:\t");
+	printall_btree(root,0);
 
 	println("Exiting!");
 	return 0;

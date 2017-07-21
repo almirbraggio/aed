@@ -17,6 +17,8 @@
 typedef unsigned int uint;
 typedef enum key_status key_status_t;
 
+// ---
+
 typedef struct btree_node_t {
     uint n; 						// keys in node
     uint keys[M-1]; 				// array of keys
@@ -53,6 +55,9 @@ bool_t isempty_btree (btree_t *node);
 
 // print in sorted order
 void inorder_btree (btree_t *node);
+
+// print all btree
+void printall_btree (btree_t *node, int tabs);
 
 // total keys
 int total_btree (btree_t *node);
