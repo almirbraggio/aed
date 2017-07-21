@@ -5,18 +5,28 @@
 #include "src/btree.h"
 
 #include <stdio.h>
+#include <stdarg.h>
 #include <stdlib.h>
 #include <time.h>
 
 //#define DBG
-#define TEST		9
+#define TEST			9
 
-#define isempty(x) 	isempty_btree(x)
+#define isempty(x) 		isempty_btree(x)
 
 // use for check seg faults and memory leaks
 // valgrind --leak-check=full ./bin_tree
 
-//void print_bintree(bintree_t r);
+static void println(const char *fmt, ...) {
+	va_list argp;
+	
+	fputc('\n', stdout);
+
+	va_start(argp, fmt);
+	vfprintf(stdout, fmt, argp);
+	va_end(argp);
+	return;
+}
 
 // Main code
 int main(int argc, char *argv[]) {
@@ -26,10 +36,10 @@ int main(int argc, char *argv[]) {
 
 #ifdef DBG
 	if (isempty(root) == true)
-		printf("\r\nB-Tree is empty.\r\n");
+		println("B-Tree is empty.");
 #endif
 
-	printf("\r\nInit:\r\n");
+	println("Input:\t");
 	srand((unsigned)time(NULL));
 	for (i = 0; i < TEST; i++) {
 		aux = (int)(rand() % 100);
@@ -41,53 +51,17 @@ int main(int argc, char *argv[]) {
 
 #ifdef DBG
 	if (isempty(root) == false)
-		printf("\r\nB-Tree is not empty.\r\n");
+		println("B-Tree is not empty.");
 #endif
 
-	printf("\r\nSorted:\r\n");
+	println("Output:\t");
 	inorder_btree(root);
 
-	printf("\r\nStatus:\r\n");
-	printf("Min = %d\tMax = %d\tTotal = %d\r\n", 
-	(int)min_btree(root), (int)max_btree(root), total_btree(root));
+	println("Status:");
+	println("\tMin %d < Max %d", (int)min_btree(root), (int)max_btree(root));
+	println("\tTotal = %d", total_btree(root));
 
-	/*unsigned int i = 0, aux = 0;
-	bintree_t tree = init_bintree();
-
-	// Argument validation	
-	if ((argc >> 1) == 0) {
-		printf("Invalid arguments.\r\nYou must specify at least one argument.\r\n");
-		return 0;
-	}
-
-	// One argument, then insert random data
-	if ((argc >> 1) == 1) {
-		aux = (unsigned int)atoi(argv[1]);
-		srand((unsigned)time(NULL));
-		for(i = 0; i < aux; i++) {
-			unsigned int x = (unsigned int)(rand() % aux);
-			tree = insert_bintree(tree, x);
-		}
-	}
-	// More arguments, then insert values
-	else {
-		for(i = 1; i < argc; i++) {
-			unsigned int x = (unsigned int)(atoi(argv[i]));
-			tree = insert_bintree(tree, (data_t)x);
-		}
-	}
-
-	// Print tree (pre, in, post order)
-	print_bintree(tree);
-
-	// Delete tree
-	tree = free_bintree(tree);
-
-	if (isempty_bintree(tree)) {
-		printf("Tree is empty!\r\n");
-	}
-*/
-	printf("Exiting!\r\n");
+	println("Exiting!");
 	return 0;
 }
 
