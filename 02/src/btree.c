@@ -10,97 +10,159 @@ btree_t *init_btree (void) {
 }
 
 // insert
-bool_t insert_btree (btree_t *node, uint key) {
+bool_t insert_btree (btree_t **node, uint key) {
 	btree_t *new_node = NULL;
 	uint up_key = 0;
-	enum key_status status = 0;//status_btree(root, key, &up_key, &new_node);
+	enum key_status status = status_btree((*node), key, &up_key, &new_node);
 	// duplicate key
 	if (status == Duplicate) {
 		printf("Key already available\n");
 	}
 	// new node
 	else if (status == Insert_It) {
-		btree_t *up_root = node;
-		node = (struct btree_node_t *)malloc(sizeof(btree_t));
-		node->n = 1;
-		node->keys[0] = up_key;
-		node->p[0] = up_root;
-		node->p[1] = new_node;
+		btree_t *up_root = (*node);
+		(*node) = (struct btree_node_t *)malloc(sizeof(btree_t));
+		(*node)->n = 1;
+		(*node)->keys[0] = up_key;
+		(*node)->p[0] = up_root;
+		(*node)->p[1] = new_node;
 		return true;
 	}
 	return false;
 }
 
-// 
-/*enum key_status status_btree (struct node_t ptr, int key, int *upKey,struct node_t *newnode) {
-    struct node *newPtr, *lastPtr;
-    int pos, i, n,splitPos;
-    int newKey, lastKey;
-    enum KeyStatus value;
-    if (ptr == NULL)
-    {
-        *newnode = NULL;
-        *upKey = key;
-        return InsertIt;
-    }
-    n = ptr->n;
-    pos = searchPos(key, ptr->keys, n);
-    if (pos < n && key == ptr->keys[pos])
-        return Duplicate;
-    value = ins(ptr->p[pos], key, &newKey, &newPtr);
-    if (value != InsertIt)
-        return value;
-    // If keys in node is less than M-1 where M is order of B tree
-    if (n < M - 1)
-    {
-        pos = searchPos(newKey, ptr->keys, n);
-        //Shifting the key and pointer right for inserting the new key
-        for (i=n; i>pos; i--)
-        {
-            ptr->keys[i] = ptr->keys[i-1];
-            ptr->p[i+1] = ptr->p[i];
-        }
-        //Key is inserted at exact location
-        ptr->keys[pos] = newKey;
-        ptr->p[pos+1] = newPtr;
-        ++ptr->n; //incrementing the number of keys in node
-        return Success;
-    }
-    //If keys in nodes are maximum and position of node to be inserted is last
-    if (pos == M - 1)
-    {
-        lastKey = newKey;
-        lastPtr = newPtr;
-    }
-    else //If keys in node are maximum and position of node to be inserted is not last
-    {
-        lastKey = ptr->keys[M-2];
-        lastPtr = ptr->p[M-1];
-        for (i=M-2; i>pos; i--)
-        {
-            ptr->keys[i] = ptr->keys[i-1];
-            ptr->p[i+1] = ptr->p[i];
-        }
-        ptr->keys[pos] = newKey;
-        ptr->p[pos+1] = newPtr;
-    }
-    splitPos = (M - 1)/2;
-    (*upKey) = ptr->keys[splitPos];
+// status
+key_status_t status_btree (btree_t *ptr, uint key, uint *up_key, btree_t **new_node) {
+	btree_t *new_ptr = NULL, *last_ptr = NULL;
+	uint new_key = 0, last_key = 0, n = 0;
+	enum key_status value;
 
-    (*newnode)=malloc(sizeof(struct node));//Right node after split
-    ptr->n = splitPos; //No. of keys for left splitted node
-    (*newnode)->n = M-1-splitPos;//No. of keys for right splitted node
-    for (i=0; i < (*newnode)->n; i++)
-    {
-        (*newnode)->p[i] = ptr->p[i + splitPos + 1];
-        if(i < (*newnode)->n - 1)
-            (*newnode)->keys[i] = ptr->keys[i + splitPos + 1];
-        else
-            (*newnode)->keys[i] = lastKey;
-    }
-    (*newnode)->p[(*newnode)->n] = lastPtr;
-    return Insert_It;
-}*/
+	// aux
+	int pos = 0, i = 0, split = 0;
+	
+	// new node, insert it
+	if (ptr == NULL) {
+		*new_node = NULL;
+		*up_key = key;
+		return Insert_It;
+	}
+
+	// get keys in node
+	n = ptr->n;
+	// search position
+	pos = search_pos_btree(key, ptr->keys, n);
+	// validation
+	if ((pos < n) && (key == ptr->keys[pos])) {
+		return Duplicate;
+	}
+	// recursive status
+	value = status_btree(ptr->p[pos], key, &new_key, &new_ptr);
+	if (value != Insert_It) {
+		return value;
+	}
+	
+	// if keys in node is less than M-1
+	// where M is order of B tree
+	if (n < (M-1)) {
+		// search position
+		pos = search_pos_btree(new_key, ptr->keys, n);
+		// shifting the key and pointer
+		for (i = n; i > pos; i--) {
+			ptr->keys[i] = ptr->keys[i-1];
+			ptr->p[i+1] = ptr->p[i];
+		}
+		// key is inserted at exact location
+		ptr->keys[pos] = new_key;
+		ptr->p[pos+1] = new_ptr;
+		// incrementing the number of keys in node
+		++ptr->n;
+		return Success;
+	}
+
+	// if keys in nodes are maximum and position of node to be inserted is last
+	if (pos == (M-1)) {
+		last_key = new_key;
+		last_ptr = new_ptr;
+	}
+	// or is not last
+	else {
+		last_key = ptr->keys[M-2];
+		last_ptr = ptr->p[M-1];
+		// shifting the key and pointer
+		for (i = (M-2); i > pos; i--) {
+			ptr->keys[i] = ptr->keys[i-1];
+			ptr->p[i+1] = ptr->p[i];
+		}
+		// key is inserted
+		ptr->keys[pos] = new_key;
+		ptr->p[pos+1] = new_ptr;
+	}
+
+	// split calc
+	split = (M-1)/2;
+	(*up_key) = ptr->keys[split];
+	// new node after split
+	(*new_node)= (struct btree_node_t *)malloc(sizeof(btree_t));
+	// keys for left splitted node
+	ptr->n = split;
+	// keys for right splitted node
+	(*new_node)->n = M-1-split;
+	for (i=0; i < (*new_node)->n; i++) {
+		(*new_node)->p[i] = ptr->p[i+split+1];
+		if (i < (((*new_node)->n)-1))
+			(*new_node)->keys[i] = ptr->keys[i+split+1];
+		else
+			(*new_node)->keys[i] = last_key;
+	}
+	(*new_node)->p[(*new_node)->n] = last_ptr;
+	return Insert_It;
+}
+
+// search
+bool_t search_btree (btree_t *node, uint key) {
+	uint n = 0;
+	int pos = 0;
+	btree_t *ptr = node;
+	while (ptr) {
+		n = ptr->n;
+		pos = search_pos_btree(key, ptr->keys, n);
+		if (pos < n && key == ptr->keys[pos]) {
+			return true;
+		}
+		ptr = ptr->p[pos];
+	}
+	return false;
+}
+
+// search position
+int search_pos_btree (uint key, uint *key_arr, uint n) {
+	int pos = 0;
+	while ((pos < n) && (key > key_arr[pos])) {
+		pos++;
+	}
+	return pos;
+}
+
+// empty
+bool_t isempty_btree (btree_t *node) {
+	return (bool_t)(node == NULL);
+}
+
+// print in sorted order
+void inorder_btree (btree_t *node) {
+	if (!isempty_btree(node)) {
+		if ((node->n) >= 1) {
+			inorder_btree(node->p[0]);
+			printf("%d ", (int)(node->keys[0]));
+			inorder_btree(node->p[1]);
+			if ((node->n) == 2) {
+				printf("%d ", (int)(node->keys[1]));
+				inorder_btree(node->p[2]);
+			}
+		}
+	}
+	return;
+}
 
 
 /*

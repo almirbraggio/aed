@@ -7,9 +7,7 @@
 #include <stdlib.h>
 #include <time.h>
 
-#ifndef NULL
-#define NULL	(0)
-#endif
+#define isempty(x) 	isempty_btree(x)
 
 // use for check seg faults and memory leaks
 // valgrind --leak-check=full ./bin_tree
@@ -19,6 +17,21 @@
 // Main code
 int main(int argc, char *argv[]) {
 	btree_t *root = init_btree();
+
+	if (isempty(root) == true)
+		printf("B-Tree is empty.\r\n");
+
+	insert_btree(&root, 6);
+	insert_btree(&root, 1);
+	insert_btree(&root, 4);
+	insert_btree(&root, 3);
+	insert_btree(&root, 2);
+	insert_btree(&root, 5);
+
+	if (isempty(root) == false)
+		printf("B-Tree is not empty.\r\n");
+
+	inorder_btree(root);
 
 	/*unsigned int i = 0, aux = 0;
 	bintree_t tree = init_bintree();
