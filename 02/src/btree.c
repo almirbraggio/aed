@@ -26,39 +26,36 @@ bintree_t free_bintree (bintree_t node) {
 bool_t insert_btree (btree_t **node, uint key) {
 	btree_t *new_node = NULL;
 	uint up_key = 0;
-	enum key_status status = status_btree((*node), key, &up_key, &new_node);
-	// duplicate key
-	if (status == Duplicate) {
-		//printf("Key already available\n");
-		return (bool_t)false;
-	}
+	enum key_status status = insert_aux_btree((*node), key, &up_key, &new_node);
+	
 	// new node
-	else if (status == Insert_It) {
-		btree_t *up_root = (*node);
-		(*node) = (struct btree_node_t *)malloc(sizeof(btree_t));
+	if (status == Insert) {
+		btree_t *up_root = *node;
+		*node = (struct btree_node_t *)malloc(sizeof(btree_t));
 		(*node)->n = 1;
 		(*node)->keys[0] = up_key;
 		(*node)->p[0] = up_root;
 		(*node)->p[1] = new_node;
-		return (bool_t)true;
+		return true;
 	}
-	return (bool_t)false;
+	
+	return false;
 }
 
-// status
-key_status_t status_btree (btree_t *ptr, uint key, uint *up_key, btree_t **new_node) {
+// insert aux
+key_status_t insert_aux_btree (btree_t *ptr, uint key, uint *up_key, btree_t **new_node) {
 	btree_t *new_ptr = NULL, *last_ptr = NULL;
 	uint new_key = 0, last_key = 0, n = 0;
-	enum key_status value;
+	key_status_t value;
 
 	// aux
 	int pos = 0, i = 0, split = 0;
 	
 	// new node, insert it
-	if (ptr == NULL) {
+	if (isempty_btree(ptr)) {
 		*new_node = NULL;
 		*up_key = key;
-		return Insert_It;
+		return Insert;
 	}
 
 	// get keys in node
@@ -70,8 +67,8 @@ key_status_t status_btree (btree_t *ptr, uint key, uint *up_key, btree_t **new_n
 		return Duplicate;
 	}
 	// recursive status
-	value = status_btree(ptr->p[pos], key, &new_key, &new_ptr);
-	if (value != Insert_It) {
+	value = insert_aux_btree(ptr->p[pos], key, &new_key, &new_ptr);
+	if (value != Insert) {
 		return value;
 	}
 	
@@ -114,9 +111,9 @@ key_status_t status_btree (btree_t *ptr, uint key, uint *up_key, btree_t **new_n
 
 	// split calc
 	split = (M-1)/2;
-	(*up_key) = ptr->keys[split];
+	*up_key = ptr->keys[split];
 	// new node after split
-	(*new_node)= (struct btree_node_t *)malloc(sizeof(btree_t));
+	*new_node = (struct btree_node_t *)malloc(sizeof(btree_t));
 	// keys for left splitted node
 	ptr->n = split;
 	// keys for right splitted node
@@ -129,11 +126,161 @@ key_status_t status_btree (btree_t *ptr, uint key, uint *up_key, btree_t **new_n
 			(*new_node)->keys[i] = last_key;
 	}
 	(*new_node)->p[(*new_node)->n] = last_ptr;
-	return Insert_It;
+	return Insert;
+}
+
+// remove
+bool_t remove_btree (btree_t **node, uint key) {
+	enum key_status status = remove_aux_btree((*node), key);
+	if (status == Less_Keys) {
+		btree_t *up_root = *node;
+		*node = (*node)->p[0];
+		free(up_root);
+		return true;
+	}
+	return false;
+}
+
+key_status_t remove_aux_btree (btree_t *ptr, uint key) {
+	/*btree_t *left_ptr = NULL, *right_ptr = NULL;
+	btree_t **p;
+	key_status_t value;
+	
+	uint *key_arr = NULL;
+	int pos, i, pivot, n;
+
+	// minimum number of keys
+	int min = (M-1)/2;
+	
+	// pointer null, error
+	if (ptr == NULL)
+		return Error;
+
+	// assigns values of node
+	n=ptr->n;
+	key_arr = ptr->keys;
+	p = ptr->p;
+	
+	// search position for key to delete
+	pos = search_pos_btree(key, key_arr, n);
+
+	// if p is a leaf
+	if (p[0] == NULL) {
+		if ((pos == n) || (key < key_arr[pos])) {
+			return Error;
+		}
+		// Shift keys and pointers left
+		for (i=pos+1; i < n; i++)
+		{
+			key_arr[i-1] = key_arr[i];
+			p[i] = p[i+1];
+		}
+		return --ptr->n >= (ptr==root ? 1 : min) ? Success : LessKeys;
+	}
+
+	//if found key but p is not a leaf
+	if (pos < n && key == key_arr[pos])
+	{
+		struct node *qp = p[pos], *qp1;
+		int nkey;
+		while(1)
+		{
+			nkey = qp->n;
+			qp1 = qp->p[nkey];
+			if (qp1 == NULL)
+				break;
+			qp = qp1;
+		}
+		key_arr[pos] = qp->keys[nkey-1];
+		qp->keys[nkey - 1] = key;
+	}
+	value = del(p[pos], key);
+	if (value != LessKeys)
+		return value;
+
+	if (pos > 0 && p[pos-1]->n > min)
+	{
+		pivot = pos - 1; // pivot for left and right node
+		lptr = p[pivot];
+		rptr = p[pos];
+		// Assigns values for right node
+		rptr->p[rptr->n + 1] = rptr->p[rptr->n];
+		for (i=rptr->n; i>0; i--)
+		{
+			rptr->keys[i] = rptr->keys[i-1];
+			rptr->p[i] = rptr->p[i-1];
+		}
+		rptr->n++;
+		rptr->keys[0] = key_arr[pivot];
+		rptr->p[0] = lptr->p[lptr->n];
+		key_arr[pivot] = lptr->keys[--lptr->n];
+		return Success;
+	}
+	if (pos < n && p[pos + 1]->n > min)
+	{
+		pivot = pos; // pivot for left and right node
+		lptr = p[pivot];
+		rptr = p[pivot+1];
+		// Assigns values for left node
+		lptr->keys[lptr->n] = key_arr[pivot];
+		lptr->p[lptr->n + 1] = rptr->p[0];
+		key_arr[pivot] = rptr->keys[0];
+		lptr->n++;
+		rptr->n--;
+		for (i=0; i < rptr->n; i++)
+		{
+			rptr->keys[i] = rptr->keys[i+1];
+			rptr->p[i] = rptr->p[i+1];
+		}
+		rptr->p[rptr->n] = rptr->p[rptr->n + 1];
+		return Success;
+	}
+
+	if(pos == n)
+		pivot = pos-1;
+	else
+		pivot = pos;
+
+	lptr = p[pivot];
+	rptr = p[pivot+1];
+	// merge right node with left node
+	lptr->keys[lptr->n] = key_arr[pivot];
+	lptr->p[lptr->n + 1] = rptr->p[0];
+	for (i=0; i < rptr->n; i++)
+	{
+		lptr->keys[lptr->n + 1 + i] = rptr->keys[i];
+		lptr->p[lptr->n + 2 + i] = rptr->p[i+1];
+	}
+	lptr->n = lptr->n + rptr->n +1;
+	free(rptr); // Remove right node
+	for (i=pos+1; i < n; i++)
+	{
+		key_arr[i-1] = key_arr[i];
+		p[i] = p[i+1];
+	}
+	return --ptr->n >= (ptr == root ? 1 : min) ? Success : LessKeys;*/
+	return Error;
 }
 
 // search
-bool_t search_btree (btree_t *node, uint key) {
+btree_t *search_btree (btree_t *node, uint key, int *pos) {
+	uint n = 0;
+
+	if (isempty_btree(node))
+		return NULL;
+
+	while ((n < node->n) && (node->keys[n] < key)) 
+		n++;
+	if (((n+1) > node->n) || (node->keys[n] > key))
+		return search_btree(node->p[n], key, pos);
+	
+	// return position and node
+	*pos = n;
+	return node;
+}
+
+// search key
+bool_t search_key_btree (btree_t *node, uint key) {
 	uint n = 0;
 	int pos = 0;
 	btree_t *ptr = node;
@@ -160,6 +307,13 @@ int search_pos_btree (uint key, uint *key_arr, uint n) {
 // empty
 bool_t isempty_btree (btree_t *node) {
 	return (bool_t)(node == NULL);
+}
+
+// leaf
+bool_t isleaf_btree (btree_t *node) {
+	if (node->p[0] == NULL)
+		return true;
+	return false;
 }
 
 // print in sorted order

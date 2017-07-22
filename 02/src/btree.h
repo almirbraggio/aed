@@ -26,10 +26,10 @@ typedef struct btree_node_t {
 } btree_t;
 
 enum key_status {
-	Duplicate, 
-	Search_Failure,
 	Success,
-	Insert_It,
+	Error,
+	Duplicate, 
+	Insert,
 	Less_Keys 
 };
 
@@ -42,10 +42,15 @@ btree_t *init_btree (void);
 
 // insert
 bool_t insert_btree (btree_t **node, uint key);
-key_status_t status_btree (btree_t *ptr, uint key, uint *up_key, btree_t **new_node);
+key_status_t insert_aux_btree (btree_t *ptr, uint key, uint *up_key, btree_t **new_node);
 
-// search and search position
-bool_t search_btree (btree_t *node, uint key);
+// remove
+bool_t remove_btree (btree_t **node, uint key);
+key_status_t remove_aux_btree (btree_t *ptr, uint key);
+
+// search
+btree_t *search_btree (btree_t *node, uint key, int *pos);
+bool_t search_key_btree (btree_t *node, uint key);
 int search_pos_btree (uint key, uint *key_arr, uint n);
 
 // empty
