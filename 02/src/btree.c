@@ -66,14 +66,14 @@ key_status_t insert_aux_btree (btree_t *ptr, uint key, uint *up_key, btree_t **n
 	if ((pos < n) && (key == ptr->keys[pos])) {
 		return Duplicate;
 	}
+
 	// recursive status
 	value = insert_aux_btree(ptr->p[pos], key, &new_key, &new_ptr);
 	if (value != Insert) {
 		return value;
 	}
-	
+
 	// if keys in node is less than M-1
-	// where M is order of B tree
 	if (n < (M-1)) {
 		// search position
 		pos = search_pos_btree(new_key, ptr->keys, n);
@@ -90,7 +90,8 @@ key_status_t insert_aux_btree (btree_t *ptr, uint key, uint *up_key, btree_t **n
 		return Success;
 	}
 
-	// if keys in nodes are maximum and position of node to be inserted is last
+	// if keys in nodes are maximum
+	// and position of node to be inserted is last
 	if (pos == (M-1)) {
 		last_key = new_key;
 		last_ptr = new_ptr;
@@ -109,7 +110,7 @@ key_status_t insert_aux_btree (btree_t *ptr, uint key, uint *up_key, btree_t **n
 		ptr->p[pos+1] = new_ptr;
 	}
 
-	// split calc
+	// then split
 	split = (M-1)/2;
 	*up_key = ptr->keys[split];
 	// new node after split
@@ -118,7 +119,7 @@ key_status_t insert_aux_btree (btree_t *ptr, uint key, uint *up_key, btree_t **n
 	ptr->n = split;
 	// keys for right splitted node
 	(*new_node)->n = M-1-split;
-	for (i=0; i < (*new_node)->n; i++) {
+	for (i = 0; i < (*new_node)->n; i++) {
 		(*new_node)->p[i] = ptr->p[i+split+1];
 		if (i < (((*new_node)->n)-1))
 			(*new_node)->keys[i] = ptr->keys[i+split+1];
@@ -131,7 +132,7 @@ key_status_t insert_aux_btree (btree_t *ptr, uint key, uint *up_key, btree_t **n
 
 // remove
 bool_t remove_btree (btree_t **node, uint key) {
-	enum key_status status = remove_aux_btree((*node), key);
+	enum key_status status = remove_aux_btree((*node), (*node), key);
 	if (status == Less_Keys) {
 		btree_t *up_root = *node;
 		*node = (*node)->p[0];
@@ -141,13 +142,14 @@ bool_t remove_btree (btree_t **node, uint key) {
 	return false;
 }
 
-key_status_t remove_aux_btree (btree_t *ptr, uint key) {
-	/*btree_t *left_ptr = NULL, *right_ptr = NULL;
+key_status_t remove_aux_btree (btree_t *root, btree_t *ptr, uint key) {
+	btree_t *left_ptr = NULL, *right_ptr = NULL;
 	btree_t **p;
 	key_status_t value;
 	
 	uint *key_arr = NULL;
-	int pos, i, pivot, n;
+	uint n = 0;
+	int pos, i, pivot;
 
 	// minimum number of keys
 	int min = (M-1)/2;
@@ -157,7 +159,7 @@ key_status_t remove_aux_btree (btree_t *ptr, uint key) {
 		return Error;
 
 	// assigns values of node
-	n=ptr->n;
+	n = ptr->n;
 	key_arr = ptr->keys;
 	p = ptr->p;
 	
@@ -165,101 +167,116 @@ key_status_t remove_aux_btree (btree_t *ptr, uint key) {
 	pos = search_pos_btree(key, key_arr, n);
 
 	// if p is a leaf
-	if (p[0] == NULL) {
+	if (isleaf_btree(*p)) {
 		if ((pos == n) || (key < key_arr[pos])) {
 			return Error;
 		}
-		// Shift keys and pointers left
-		for (i=pos+1; i < n; i++)
-		{
-			key_arr[i-1] = key_arr[i];
-			p[i] = p[i+1];
+		else {
+			// shift keys and pointers to left
+			for (i = (pos+1); i < n; i++) {
+				key_arr[i-1] = key_arr[i];
+				p[i] = p[i+1];
+			}
+			if (ptr == root)
+				min = 1;
+			if ((--ptr->n) >= min)
+				return Success;
+			return Less_Keys;
 		}
-		return --ptr->n >= (ptr==root ? 1 : min) ? Success : LessKeys;
 	}
 
-	//if found key but p is not a leaf
-	if (pos < n && key == key_arr[pos])
-	{
-		struct node *qp = p[pos], *qp1;
-		int nkey;
-		while(1)
-		{
-			nkey = qp->n;
-			qp1 = qp->p[nkey];
-			if (qp1 == NULL)
+	// if found key but p is not a leaf
+	if ((pos < n) && (key == key_arr[pos])) {
+		btree_t *ptr1 = NULL, *ptr2 = NULL;
+		uint nkey = 0;
+
+		ptr1 = p[pos];
+		while(1) {
+			nkey = ptr1->n;
+			ptr2 = ptr1->p[nkey];
+			if (ptr2 == NULL)
 				break;
-			qp = qp1;
+			ptr1 = ptr2;
 		}
-		key_arr[pos] = qp->keys[nkey-1];
-		qp->keys[nkey - 1] = key;
+		key_arr[pos] = ptr1->keys[nkey-1];
+		ptr1->keys[nkey - 1] = key;
 	}
-	value = del(p[pos], key);
-	if (value != LessKeys)
+
+	// recursive remove
+	value = remove_aux_btree(root, p[pos], key);
+	if (value != Less_Keys)
 		return value;
 
-	if (pos > 0 && p[pos-1]->n > min)
-	{
-		pivot = pos - 1; // pivot for left and right node
-		lptr = p[pivot];
-		rptr = p[pos];
-		// Assigns values for right node
-		rptr->p[rptr->n + 1] = rptr->p[rptr->n];
-		for (i=rptr->n; i>0; i--)
-		{
-			rptr->keys[i] = rptr->keys[i-1];
-			rptr->p[i] = rptr->p[i-1];
+	if ((pos > 0) && ((p[pos-1]->n) > min)) {
+		// pivot for left and right node
+		pivot = pos - 1;
+		left_ptr = p[pivot];
+		right_ptr = p[pos];
+
+		// assigns values for right node
+		right_ptr->p[right_ptr->n + 1] = right_ptr->p[right_ptr->n];
+		for (i = right_ptr->n; i > 0; i--) {
+			right_ptr->keys[i] = right_ptr->keys[i-1];
+			right_ptr->p[i] = right_ptr->p[i-1];
 		}
-		rptr->n++;
-		rptr->keys[0] = key_arr[pivot];
-		rptr->p[0] = lptr->p[lptr->n];
-		key_arr[pivot] = lptr->keys[--lptr->n];
-		return Success;
-	}
-	if (pos < n && p[pos + 1]->n > min)
-	{
-		pivot = pos; // pivot for left and right node
-		lptr = p[pivot];
-		rptr = p[pivot+1];
-		// Assigns values for left node
-		lptr->keys[lptr->n] = key_arr[pivot];
-		lptr->p[lptr->n + 1] = rptr->p[0];
-		key_arr[pivot] = rptr->keys[0];
-		lptr->n++;
-		rptr->n--;
-		for (i=0; i < rptr->n; i++)
-		{
-			rptr->keys[i] = rptr->keys[i+1];
-			rptr->p[i] = rptr->p[i+1];
-		}
-		rptr->p[rptr->n] = rptr->p[rptr->n + 1];
+
+		right_ptr->n++;
+		right_ptr->keys[0] = key_arr[pivot];
+		right_ptr->p[0] = left_ptr->p[left_ptr->n];
+		key_arr[pivot] = left_ptr->keys[--left_ptr->n];
 		return Success;
 	}
 
-	if(pos == n)
+	if ((pos < n) && ((p[pos + 1]->n) > min)) {
+		// pivot for left and right node
+		pivot = pos; 
+		left_ptr = p[pivot];
+		right_ptr = p[pivot+1];
+
+		// assigns values for left node
+		left_ptr->keys[left_ptr->n] = key_arr[pivot];
+		left_ptr->p[left_ptr->n + 1] = right_ptr->p[0];
+		key_arr[pivot] = right_ptr->keys[0];
+		left_ptr->n++;
+		right_ptr->n--;
+		for (i = 0; i < right_ptr->n; i++) {
+			right_ptr->keys[i] = right_ptr->keys[i+1];
+			right_ptr->p[i] = right_ptr->p[i+1];
+		}
+		right_ptr->p[right_ptr->n] = right_ptr->p[right_ptr->n + 1];
+		return Success;
+	}
+
+	if (pos == n)
 		pivot = pos-1;
 	else
 		pivot = pos;
 
-	lptr = p[pivot];
-	rptr = p[pivot+1];
+	left_ptr = p[pivot];
+	right_ptr = p[pivot+1];
+
 	// merge right node with left node
-	lptr->keys[lptr->n] = key_arr[pivot];
-	lptr->p[lptr->n + 1] = rptr->p[0];
-	for (i=0; i < rptr->n; i++)
-	{
-		lptr->keys[lptr->n + 1 + i] = rptr->keys[i];
-		lptr->p[lptr->n + 2 + i] = rptr->p[i+1];
+	left_ptr->keys[left_ptr->n] = key_arr[pivot];
+	left_ptr->p[left_ptr->n + 1] = right_ptr->p[0];
+	for (i = 0; i < right_ptr->n; i++) {
+		left_ptr->keys[left_ptr->n + 1 + i] = right_ptr->keys[i];
+		left_ptr->p[left_ptr->n + 2 + i] = right_ptr->p[i+1];
 	}
-	lptr->n = lptr->n + rptr->n +1;
-	free(rptr); // Remove right node
-	for (i=pos+1; i < n; i++)
-	{
+
+	left_ptr->n = left_ptr->n + right_ptr->n + 1;
+	
+	// remove right node
+	free(right_ptr);
+	for (i = pos+1; i < n; i++) {
 		key_arr[i-1] = key_arr[i];
 		p[i] = p[i+1];
 	}
-	return --ptr->n >= (ptr == root ? 1 : min) ? Success : LessKeys;*/
-	return Error;
+
+	if (ptr == root)
+		min = 1;
+	if ((--ptr->n) >= min)
+		return Success;
+	return Less_Keys;
 }
 
 // search
@@ -306,7 +323,9 @@ int search_pos_btree (uint key, uint *key_arr, uint n) {
 
 // empty
 bool_t isempty_btree (btree_t *node) {
-	return (bool_t)(node == NULL);
+	if (node == NULL)
+		return true;
+	return false;
 }
 
 // leaf

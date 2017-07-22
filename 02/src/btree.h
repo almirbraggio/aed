@@ -28,9 +28,9 @@ typedef struct btree_node_t {
 enum key_status {
 	Success,
 	Error,
-	Duplicate, 
 	Insert,
-	Less_Keys 
+	Duplicate,
+	Less_Keys
 };
 
 // ---
@@ -46,15 +46,16 @@ key_status_t insert_aux_btree (btree_t *ptr, uint key, uint *up_key, btree_t **n
 
 // remove
 bool_t remove_btree (btree_t **node, uint key);
-key_status_t remove_aux_btree (btree_t *ptr, uint key);
+key_status_t remove_aux_btree (btree_t *root, btree_t *ptr, uint key);
 
 // search
 btree_t *search_btree (btree_t *node, uint key, int *pos);
 bool_t search_key_btree (btree_t *node, uint key);
 int search_pos_btree (uint key, uint *key_arr, uint n);
 
-// empty
+// empty or leaf
 bool_t isempty_btree (btree_t *node);
+bool_t isleaf_btree (btree_t *node);
 
 // prints
 void inorder_btree (btree_t *node);

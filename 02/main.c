@@ -43,10 +43,8 @@ int main(int argc, char *argv[]) {
 	println("Input:\t");
 	srand((unsigned)time(NULL));
 	for (i = 0; i < TEST; i++) {
-		aux = (int)(rand() % 100);
+		aux = (int)(rand() % 9);
 		status = insert_btree(&root, (uint)aux);
-		// TODO: verificar status true/false
-		//if (status == true)
 		printf("%d ", aux);
 	}
 
@@ -67,25 +65,14 @@ int main(int argc, char *argv[]) {
 	println("Tree:\t");
 	printall_btree(root,0);
 
+	// remove test
+	remove_btree(&root, (uint)1);
+	remove_btree(&root, (uint)2);
+
+	// print again
+	println("Tree:\t");
+	printall_btree(root,0);
+
 	println("Exiting!\r\n");
 	return 0;
 }
-
-/*
-// Prints
-void print_bintree(bintree_t r) {
-	// pre
-	printf("Pre Order:\r\n");
-	preorder_bintree(r);
-	printf("\r\n");
-	// in
-	printf("In Order:\r\n");
-	inorder_bintree(r);
-	printf("\r\n");
-	// post
-	printf("Post Order:\r\n");
-	postorder_bintree(r);
-	printf("\r\n");
-	return;
-}
-*/
