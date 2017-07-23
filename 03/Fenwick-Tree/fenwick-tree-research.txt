@@ -3,7 +3,7 @@ Fenwick-Tree
 ---
 Introdução
 
-Uma árvore de Fenwick ou árvore binária indexada, do inglês binary indexed tree, é uma estrutura de dados com o objetivo de atualizar elementos e calcular somas cumulativas. Esta estrutura foi proposta por Peter Fenwick em 1994 (A New Data Structure for Cumulative Frequency Tables).
+Uma árvore de Fenwick ou árvore binária indexada, do inglês binary indexed tree, é uma estrutura de dados com o objetivo de atualizar elementos em listas e calcular somas cumulativas de maneira eficiente. Esta estrutura foi proposta por Peter Fenwick em 1994 (A New Data Structure for Cumulative Frequency Tables).
 
 Quando comparado com listas numéricas simples, como vetores, a árvore de Fenwick pode atualizar elementos e calcular somas cumulativas de maneira muito mais eficiente. Em um vetor de N elementos, podemos atualizar um elemento ou calcular o somatório com uma complexidade de tempo O(N). Em uma árvore de Fenwick, as mesmas operações apresentam uma complexidade de tempo O(log N).
 
@@ -43,20 +43,20 @@ lista 			5		1		15		11		52		28		0
 soma 			5		6		21		32		84		112		112
 
 4
-2				6
-1		3		5		7
+2                  6
+1        3         5         7
 
 4 (32)
-2 (6)			6 (80)
-1 (5)	3 (15)	5 (52)	7 (0)
+2 (6)              6 (80)
+1 (5)    3 (15)    5 (52)    7 (0)
 
 Com esse estrutura é fácil determinar a soma cumulativa de um ponto. O conceito é usar um contador iniciando em zero, então fazer uma busca binária normal até encontrar o nó que deseja, porém com uma regra: ao mover para a direita, o contador é incrementado com o valor do nó.
 
 Por exemplo, para a soma cumulativa da posição/nó (3):
 
 4 (32)
-2 (6)			6 (80)
-1 (5)	3 (15)	5 (52)	7 (0)
+2 (6)              6 (80)
+1 (5)    3 (15)    5 (52)    7 (0)
 
 Iniciando na raiz (4). Contador é igual a zero.
 (3) é menor que (4), então para a esquerda. Contador é mantido em zero.
@@ -67,8 +67,8 @@ A soma cumulativa do elemento (3) é 0+6+15 = 21.
 Outro exemplo, para a soma cumulativa da posição/nó (5):
 
 4 (32)
-2 (6)			6 (80)
-1 (5)	3 (15)	5 (52)	7 (0)
+2 (6)              6 (80)
+1 (5)    3 (15)    5 (52)    7 (0)
 
 Iniciando na raiz (4). Contador é igual a zero.
 (5) é maior que (4), então para a direita. Contador é incrementado em 32.
@@ -81,8 +81,8 @@ Iniciando no nó folha, de modo reverso, o contador deve ser iniciado com o valo
 Por exemplo, iniciando em (3):
 
 4 (32)
-2 (6)			6 (80)
-1 (5)	3 (15)	5 (52)	7 (0)
+2 (6)              6 (80)
+1 (5)    3 (15)    5 (52)    7 (0)
 
 Iniciando em (3). Contador é igual a 15.
 (3) é maior que (2), filho da direita. Contador é incrementado em 6.
@@ -94,58 +94,61 @@ Agora, para incrementar ou atualizar o valor de um nó, é necessário atualizar
 Por exemplo, para incrementar a soma do nó (1) em 5:
 
 4 (32)
-2 (6)			6 (80)
-1 (5)	3 (15)	5 (52)	7 (0)
+2 (6)              6 (80)
+1 (5)    3 (15)    5 (52)    7 (0)
 
 Iniciando em (1). Incrementar em 5:
 
 4 (32)
-2 (6)			6 (80)
-1 (5+5)	3 (15)	5 (52)	7 (0)
+2 (6)              6 (80)
+1 (5+5)  3 (15)    5 (52)    7 (0)
 
 Caminha em direção a raiz, se for um filho da esquerda, incrementa também o pai:
 
 4 (32)
-2 (6+5)			6 (80)
-1 (5+5)	3 (15)	5 (52)	7 (0)
+2 (6+5)            6 (80)
+1 (5+5)  3 (15)    5 (52)    7 (0)
 
 Novamente, se for um filho da esquerda, incrementa:
 
 4 (32+5)
-2 (6+5)			6 (80)
-1 (5+5)	3 (15)	5 (52)	7 (0)
+2 (6+5)            6 (80)
+1 (5+5)  3 (15)    5 (52)    7 (0)
 
 A nova árvore, portanto:
 
 4 (37)
-2 (11)			6 (80)
-1 (10)	3 (15)	5 (52)	7 (0)
+2 (11)             6 (80)
+1 (10)  3 (15)     5 (52)    7 (0)
 
-Para se gerar a árvore binária a partir de uma lista de números, é necessário relembrar a representação binária (zeros e uns):
+Então, se verifica que a soma e atualização de elementos na árvore binária é simples e a recursividade é de grande valia. Porém, ainda há a questão de como se gerar a árvore binária a partir de uma lista numérica de entrada. Para isso é necessário relembrar a representação binária (zeros e uns):
+
+1: 001
+2: 010
+3: 011
+4: 100
+...
 
 100 (37)
-010 (11)				110 (80)
-001 (10)	011 (15)	101 (52)	111 (0)
+010 (11)                110 (80)
+001 (10)    011 (15)    101 (52)    111 (0)
 
 Aqui, se faz uma observação, se rotacionarmos os índices para a esquerda até o primeiro 1 menos significativo, temos:
 
-100>> (37)
-010>> (11)				110>> (80)
-001>> (10)	011>> (15)	101>> (52)	111>> (0)
+1: 001 >> 00
+2: 010 >> 0
+3: 011 >> 01
+4: 100 >> vazio
+5: 101 >> 10
+6: 110 >> 1
+7: 111 >> 11
+...
 
 vazio (37)
-0  (11)					1  (80)
-00 (10)		01 (15)		10 (52)		11 (0)
+0     (11)                  1     (80)
+00    (10)    01    (15)    10    (52)    11    (0)
 
-Se o caminho é o da esquerda, adiciona um 0. Se for o da direita, adiciona um 1. Iniciando do vazio, para irmos ao nó (5):
-
-vazio
-direita, adiciona 1: 1
-esquerda, adiciona 0: 10 
-
-Isso é importante porque as operações de pesquisa e atualização dependem do caminho de acesso: filho da esquerda ou da direita. Ou seja, da propriedade da árvore binária perfeita:
-
-Dada o nó N, o próximo nó no caminho de acesso de volta à raiz é dado pela representação binária de N removendo o 1 menos significativo.
+O que se verifica: se o caminho é o da esquerda, adiciona um 0 e se for o da direita, adiciona um 1. Isso é importante porque as operações de pesquisa e atualização dependem do caminho de acesso: filho da esquerda ou da direita. Ou seja, dado o nó N, o próximo nó no caminho de acesso de volta à raiz é dado pela representação binária de N removendo o 1 menos significativo.
 
 Isso significa que é possível calcular a soma cumulativa dos nós com o seguinte algoritmo:
 
@@ -155,8 +158,7 @@ Repetir o seguinte enquanto N for diferente de 0
 	Adiciona o valor ao nó N
 	Limpa o bit menos significativo do índice N
 
-Para o algoritmo de atualização, é possível inverter a lógica, trocando 1 por 0 e 0 por 1.
-Por causa desse truque de índices binários, não é preciso armazenar uma árvore explicitamente. Pode-se armazenar um vetor e utilizar as técnicas de bit a bit para navegar no vetor.
+Para o algoritmo de atualização, é possível inverter a lógica, trocando 1 por 0 e 0 por 1. Por causa desse truque de índices binários, não é preciso armazenar uma árvore explicitamente. Pode-se armazenar um vetor e utilizar as técnicas de bit a bit para navegar no vetor.
 
 ---
 Descrição do Tipo Abstrato de Dados
