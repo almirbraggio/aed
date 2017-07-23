@@ -1,11 +1,193 @@
 Fenwick-Tree
----
 
+---
 Introdução
 
-Uma árvore de Fenwick ou árvore binária indexada, do inglês binary indexed tree, é uma estrutura de dados com o objetivo de atualizar elementos e calcular somas cumulativas. Esta estrutura foi proposta por Peter Fenwick em 1994.
+Uma árvore de Fenwick ou árvore binária indexada, do inglês binary indexed tree, é uma estrutura de dados com o objetivo de atualizar elementos e calcular somas cumulativas. Esta estrutura foi proposta por Peter Fenwick em 1994 (A New Data Structure for Cumulative Frequency Tables).
 
-Quando comparado com listas numéricas simples, como vetores, a árvore de Fenwick pode atualizar elementos e calcular somas cumulativas de maneira muito mais eficiente.
+Quando comparado com listas numéricas simples, como vetores, a árvore de Fenwick pode atualizar elementos e calcular somas cumulativas de maneira muito mais eficiente. Em um vetor de N elementos, podemos atualizar um elemento ou calcular o somatório com uma complexidade de tempo O(N). Em uma árvore de Fenwick, as mesmas operações apresentam uma complexidade de tempo O(log N).
 
-Em um vetor de N elementos, podemos atualizar um elemento ou calcular o somatório com uma complexidade de tempo O(N). Em uma árvore de Fenwick, as mesmas operações apresentam uma complexidade de tempo O(log N).
+---
+Prefix Sum
 
+A soma de uma sequência de números em ordem prefixa, também conhecida como soma de varredura ou cumulativa, é a simples soma dos N primeiros números da sequência, como:
+
+entrada			1		2		3		4		5		6 	...
+somatório 		1		3		6		10		15		21 	...
+
+Ou seja, Y(i) = Y(y-1) + X(i)
+Por mais trivial que pareça, a aplicação de somas cumulativas é vasta. Pode ser usada em algoritmos de ordenação, por exemplo.
+
+---
+Definição
+
+Supondo uma aplicação com interesse na soma cumulativa de uma lista de números, por exemplo:
+
+posição			1		2		3		4		5		6		7
+lista 			5		1		8		11		52		28		0
+soma 			5		6		14		25		77		105		105
+
+Agora, no caso de uma atualização de um elemento, para a lista, a alteração é simples e tem complexidade O(1), porém, para a soma, a alteração tem complexidade O(N). Por exemplo, ao alterar o terceiro elemento, é necessário alterar todos os posteriores:
+
+posição			1		2		3		4		5		6		7
+lista 			5		1		8+7		11		52		28		0
+soma 			5		6		14+7	25+7	77+7	105+7	105+7
+
+lista 			5		1		15		11		52		28		0
+soma 			5		6		21		32		84		112		112
+
+Para se resolver esse problema de complexidade de tempo, se propõem o uso de uma árvore binária, onde cada nó armazena a soma cumulativa de todos os nós a sua esquerda, incluindo ele mesmo.
+
+posição			1		2		3		4		5		6		7
+lista 			5		1		15		11		52		28		0
+soma 			5		6		21		32		84		112		112
+
+4
+2				6
+1		3		5		7
+
+4 (32)
+2 (6)			6 (80)
+1 (5)	3 (15)	5 (52)	7 (0)
+
+Com esse estrutura é fácil determinar a soma cumulativa de um ponto. O conceito é usar um contador iniciando em zero, então fazer uma busca binária normal até encontrar o nó que deseja, porém com uma regra: ao mover para a direita, o contador é incrementado com o valor do nó.
+
+Por exemplo, para a soma cumulativa da posição/nó (3):
+
+4 (32)
+2 (6)			6 (80)
+1 (5)	3 (15)	5 (52)	7 (0)
+
+Iniciando na raiz (4). Contador é igual a zero.
+(3) é menor que (4), então para a esquerda. Contador é mantido em zero.
+(3) é maior que (2), então para a direita. Nesse caso o contador é incrementado em 6.
+Encontrou o nó (3). O contador é incrementado em 15.
+A soma cumulativa do elemento (3) é 0+6+15 = 21.
+
+Outro exemplo, para a soma cumulativa da posição/nó (5):
+
+4 (32)
+2 (6)			6 (80)
+1 (5)	3 (15)	5 (52)	7 (0)
+
+Iniciando na raiz (4). Contador é igual a zero.
+(5) é maior que (4), então para a direita. Contador é incrementado em 32.
+(5) é menor que (6), então para a esquerda. Contador é mantido.
+Encontrou o nó (5). O contador é incrementado em 52.
+A soma cumulativa do elemento (5) é 0+32+52 = 84.
+
+Iniciando no nó folha, de modo reverso, o contador deve ser iniciado com o valor do nó e caminhar em direção a raiz. Quando o nó for o da direita, o contador é incrementado.
+
+Por exemplo, iniciando em (3):
+
+4 (32)
+2 (6)			6 (80)
+1 (5)	3 (15)	5 (52)	7 (0)
+
+Iniciando em (3). Contador é igual a 15.
+(3) é maior que (2), filho da direita. Contador é incrementado em 6.
+(3) é menor que (4), filho da esquerda. Contador se mantém.
+A soma cumulativa do elemento (3) é 15+6+0 = 21.
+
+Agora, para incrementar ou atualizar o valor de um nó, é necessário atualizar os nós da árvore que incluírem a sub-árvore da esquerda. Para fazer isso deve-se incrementar a soma do nó desejado e então caminhar em direção a raiz da árvore. Sempre que for um filho esquerdo, deve-se incrementar a soma daquele nó.
+
+Por exemplo, para incrementar a soma do nó (1) em 5:
+
+4 (32)
+2 (6)			6 (80)
+1 (5)	3 (15)	5 (52)	7 (0)
+
+Iniciando em (1). Incrementar em 5:
+
+4 (32)
+2 (6)			6 (80)
+1 (5+5)	3 (15)	5 (52)	7 (0)
+
+Caminha em direção a raiz, se for um filho da esquerda, incrementa também o pai:
+
+4 (32)
+2 (6+5)			6 (80)
+1 (5+5)	3 (15)	5 (52)	7 (0)
+
+Novamente, se for um filho da esquerda, incrementa:
+
+4 (32+5)
+2 (6+5)			6 (80)
+1 (5+5)	3 (15)	5 (52)	7 (0)
+
+A nova árvore, portanto:
+
+4 (37)
+2 (11)			6 (80)
+1 (10)	3 (15)	5 (52)	7 (0)
+
+Para se gerar a árvore binária a partir de uma lista de números, é necessário relembrar a representação binária (zeros e uns):
+
+100 (37)
+010 (11)				110 (80)
+001 (10)	011 (15)	101 (52)	111 (0)
+
+Aqui, se faz uma observação, se rotacionarmos os índices para a esquerda até o primeiro 1 menos significativo, temos:
+
+100>> (37)
+010>> (11)				110>> (80)
+001>> (10)	011>> (15)	101>> (52)	111>> (0)
+
+vazio (37)
+0  (11)					1  (80)
+00 (10)		01 (15)		10 (52)		11 (0)
+
+Se o caminho é o da esquerda, adiciona um 0. Se for o da direita, adiciona um 1. Iniciando do vazio, para irmos ao nó (5):
+
+vazio
+direita, adiciona 1: 1
+esquerda, adiciona 0: 10 
+
+Isso é importante porque as operações de pesquisa e atualização dependem do caminho de acesso: filho da esquerda ou da direita. Ou seja, da propriedade da árvore binária perfeita:
+
+Dada o nó N, o próximo nó no caminho de acesso de volta à raiz é dado pela representação binária de N removendo o 1 menos significativo.
+
+Isso significa que é possível calcular a soma cumulativa dos nós com o seguinte algoritmo:
+
+Escrever o índice do nó N em binário
+Setar o contador para 0
+Repetir o seguinte enquanto N for diferente de 0
+	Adiciona o valor ao nó N
+	Limpa o bit menos significativo do índice N
+
+Para o algoritmo de atualização, é possível inverter a lógica, trocando 1 por 0 e 0 por 1.
+Por causa desse truque de índices binários, não é preciso armazenar uma árvore explicitamente. Pode-se armazenar um vetor e utilizar as técnicas de bit a bit para navegar no vetor.
+
+---
+Descrição do Tipo Abstrato de Dados
+
+---
+Aplicações
+(...)
+Data structures
+
+When a data set may be updated dynamically, it may be stored in a Fenwick tree data structure. This structure allows both the lookup of any individual prefix sum value and the modification of any array value in logarithmic time per operation.[11]
+
+For higher-dimensional arrays, the summed area table provides a data structure based on prefix sums for computing sums of arbitrary rectangular subarrays. This can be a helpful primitive in image convolution operations.[12]
+Applications
+
+Counting sort is an integer sorting algorithm that uses the prefix sum of a histogram of key frequencies to calculate the position of each key in the sorted output array. It runs in linear time for integer keys that are smaller than the number of items, and is frequently used as part of radix sort, a fast algorithm for sorting integers that are less restricted in magnitude.[1]
+
+List ranking, the problem of transforming a linked list into an array that represents the same sequence of items, can be viewed as computing a prefix sum on the sequence 1, 1, 1, ... and then mapping each item to the array position given by its prefix sum value; by combining list ranking, prefix sums, and Euler tours, many important problems on trees may be solved by efficient parallel algorithms.[3]
+
+An early application of parallel prefix sum algorithms was in the design of binary adders, Boolean circuits that can add two n-bit binary numbers. In this application, the sequence of carry bits of the addition can be represented as a scan operation on the sequence of pairs of input bits, using the majority function to combine the previous carry with these two bits. Each bit of the output number can then be found as the exclusive or of two input bits with the corresponding carry bit. By using a circuit that performs the operations of the parallel prefix sum algorithm, it is possible to design an adder that uses O(n) logic gates and O(log n) time steps.[2][8][9]
+
+In the parallel random access machine model of computing, prefix sums can be used to simulate parallel algorithms that assume the ability for multiple processors to access the same memory cell at the same time, on parallel machines that forbid simultaneous access. By means of a sorting network, a set of parallel memory access requests can be ordered into a sequence such that accesses to the same cell are contiguous within the sequence; scan operations can then be used to determine which of the accesses succeed in writing to their requested cells, and to distribute the results of memory read operations to multiple processors that request the same result.[13]
+
+In the construction of Gray codes, sequences of binary values with the property that consecutive sequence values differ from each other in a single bit position, a number n can be converted into the Gray code value at position n of the sequence simply by taking the exclusive or of n and n/2 (the number formed by shifting n right by a single bit position). The reverse operation, decoding a Gray-coded value x into a binary number, is more complicated, but can be expressed as the prefix sum of the bits of x, where each summation operation within the prefix sum is performed modulo two. A prefix sum of this type may be performed efficiently using the bitwise Boolean operations available on modern computers, by computing the exclusive or of x with each of the numbers formed by shifting x to the left by a number of bits that is a power of two.[14]
+
+Parallel prefix (using multiplication as the underlying associative operation) can also be used to build fast algorithms for parallel polynomial interpolation. In particular, it can be used to compute the divided difference coefficients of the Newton form of the interpolation polynomial.[15] This prefix based approach can also be used to obtain the generalized divided differences for (confluent) Hermite interpolation as well as for parallel algorithms for Vandermonde systems.[16]
+
+---
+Implementação como Lista
+
+---
+Implementação como Árvore
+
+---
+Complexidade
