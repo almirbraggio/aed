@@ -165,25 +165,35 @@ Descrição do Tipo Abstrato de Dados
 
 ---
 Aplicações
+
+Como a atualização dos elementos pode ser feita dinamicamente, e como a complexidade é logarítmica, a árvore de Fenwick pode ser utilizada em diversas aplicações.
+
+A soma cumulativa é útil em operações de convolução (basicamente uma soma de multiplicações) e, para matrizes de grandes dimensões, uma baixa complexidade de tempo é importante. 
+
+Como dito, outra aplicação é em algoritmos de ordenação. O algoritmo 'counting sort', por exemplo, usa a soma cumulativa para calcular a posição de cada elemento de entrada em um vetor de saída. Esse algoritmo é usado como parte do 'radix sort'.
+
+void counting_sort (int input[], int num, int max) {
+	int count[num] = {0};
+	
+	// counting the occurrence of each element in the array input[]
+	for (int i = 0; i < num; ++i)
+		count[input[i]] += 1;
+	
+	// the value at each index in count[] is the occurrence of that element
+	for (int i = 0; i <= max; ++i)
+		for(int j = 1; j <= count[i]; ++j)
+			printf("%d ", i);
+}
+
+Exemplo:
+	input[15] = {0, 4, 2, 2, 3, 0, 0, 1, 1, 0, 1, 0, 2, 4, 2};
+	counting_sort (input, 15, 4);
+	count[4] = {5, 3, 4, 1, 2};
+	output: 0 0 0 0 0 1 1 1 2 2 2 2 3 4 4
+
+
+Outras aplicações?
 (...)
-Data structures
-
-When a data set may be updated dynamically, it may be stored in a Fenwick tree data structure. This structure allows both the lookup of any individual prefix sum value and the modification of any array value in logarithmic time per operation.[11]
-
-For higher-dimensional arrays, the summed area table provides a data structure based on prefix sums for computing sums of arbitrary rectangular subarrays. This can be a helpful primitive in image convolution operations.[12]
-Applications
-
-Counting sort is an integer sorting algorithm that uses the prefix sum of a histogram of key frequencies to calculate the position of each key in the sorted output array. It runs in linear time for integer keys that are smaller than the number of items, and is frequently used as part of radix sort, a fast algorithm for sorting integers that are less restricted in magnitude.[1]
-
-List ranking, the problem of transforming a linked list into an array that represents the same sequence of items, can be viewed as computing a prefix sum on the sequence 1, 1, 1, ... and then mapping each item to the array position given by its prefix sum value; by combining list ranking, prefix sums, and Euler tours, many important problems on trees may be solved by efficient parallel algorithms.[3]
-
-An early application of parallel prefix sum algorithms was in the design of binary adders, Boolean circuits that can add two n-bit binary numbers. In this application, the sequence of carry bits of the addition can be represented as a scan operation on the sequence of pairs of input bits, using the majority function to combine the previous carry with these two bits. Each bit of the output number can then be found as the exclusive or of two input bits with the corresponding carry bit. By using a circuit that performs the operations of the parallel prefix sum algorithm, it is possible to design an adder that uses O(n) logic gates and O(log n) time steps.[2][8][9]
-
-In the parallel random access machine model of computing, prefix sums can be used to simulate parallel algorithms that assume the ability for multiple processors to access the same memory cell at the same time, on parallel machines that forbid simultaneous access. By means of a sorting network, a set of parallel memory access requests can be ordered into a sequence such that accesses to the same cell are contiguous within the sequence; scan operations can then be used to determine which of the accesses succeed in writing to their requested cells, and to distribute the results of memory read operations to multiple processors that request the same result.[13]
-
-In the construction of Gray codes, sequences of binary values with the property that consecutive sequence values differ from each other in a single bit position, a number n can be converted into the Gray code value at position n of the sequence simply by taking the exclusive or of n and n/2 (the number formed by shifting n right by a single bit position). The reverse operation, decoding a Gray-coded value x into a binary number, is more complicated, but can be expressed as the prefix sum of the bits of x, where each summation operation within the prefix sum is performed modulo two. A prefix sum of this type may be performed efficiently using the bitwise Boolean operations available on modern computers, by computing the exclusive or of x with each of the numbers formed by shifting x to the left by a number of bits that is a power of two.[14]
-
-Parallel prefix (using multiplication as the underlying associative operation) can also be used to build fast algorithms for parallel polynomial interpolation. In particular, it can be used to compute the divided difference coefficients of the Newton form of the interpolation polynomial.[15] This prefix based approach can also be used to obtain the generalized divided differences for (confluent) Hermite interpolation as well as for parallel algorithms for Vandermonde systems.[16]
 
 ---
 Implementação como Lista
@@ -193,3 +203,6 @@ Implementação como Árvore
 
 ---
 Complexidade
+
+O(N.log N) para construção da árvore.
+O(log N) para ambas operações, de atualização e de soma.
