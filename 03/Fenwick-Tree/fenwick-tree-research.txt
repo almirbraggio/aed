@@ -1,3 +1,11 @@
 Fenwick-Tree
 ---
 
+Introdução
+
+Uma árvore de Fenwick ou árvore binária indexada, do inglês binary indexed tree, é uma estrutura de dados com o objetivo de atualizar elementos e calcular somas cumulativas. Esta estrutura foi proposta por Peter Fenwick em 1994.
+
+Quando comparado com listas numéricas simples, como vetores, a árvore de Fenwick pode atualizar elementos e calcular somas cumulativas de maneira muito mais eficiente.
+
+Em um vetor de N elementos, podemos atualizar um elemento ou calcular o somatório com uma complexidade de tempo O(N). Em uma árvore de Fenwick, as mesmas operações apresentam uma complexidade de tempo O(log N).
+
