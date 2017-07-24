@@ -34,7 +34,7 @@ int main(int argc, char *argv[]) {
 	for (i = 2; i <= 7; i++) {
 		avl = insert_avltree(avl, i, i);
 	}
-			print_avltree(avl);
+	print_inorder_avltree(avl);
 
 
 

@@ -39,7 +39,11 @@ avltree_t rotate_right_avltree (avltree_t root);
 avltree_t rotate_left_avltree (avltree_t root);
 
 // prints
-void print_indent_avltree (avltree_t node, unsigned int indent);
-void print_avltree (avltree_t node);
+void print_preorder_avltree (avltree_t node);
+void print_inorder_avltree (avltree_t node);
+void print_posorder_avltree (avltree_t node);
+
+// find
+avltree_t find_index_avltree (avltree_t node, int index);
 
 #endif

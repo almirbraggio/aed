@@ -5,6 +5,8 @@
 #include <stdlib.h>
 #include <stdio.h>
 
+//#define DEBUG
+
 // init
 avltree_t init_avltree (int index, unsigned int data) {
 	return make_avltree(NULL, index, data);
@@ -152,60 +154,65 @@ avltree_t rotate_left_avltree (avltree_t root) {
 	return new_root;
 }
 
-void print_indent_avltree (avltree_t node, unsigned int indent) {
-	int i = 0;
-	for (i = 0; i < indent; i++)
-		printf(" ");
-	
+void print_preorder_avltree (avltree_t node) {	
 	if (!node) {
 		// is empty
 		return;
 	}		
 	else {
+#ifdef DEBUG
 		printf("Index: %d; Height: %d; Data: %d\n", node->index, (int)node->height, (int)node->data);
-		print_indent_avltree(node->left, 2*indent);
-		print_indent_avltree(node->right, 2*indent);
+#else
+		printf("%d ", (int)node->data);
+#endif
+		print_preorder_avltree(node->left);
+		print_preorder_avltree(node->right);
 		return;
 	}
 }
 
-void print_avltree (avltree_t node) {
-	print_indent_avltree(node, 0);
+void print_inorder_avltree (avltree_t node) {	
+	if (!node) {
+		// is empty
+		return;
+	}		
+	else {
+		print_inorder_avltree(node->left);
+#ifdef DEBUG
+		printf("Index: %d; Height: %d; Data: %d\n", node->index, (int)node->height, (int)node->data);
+#else
+		printf("%d ", (int)node->data);
+#endif
+		print_inorder_avltree(node->right);
+		return;
+	}
 }
 
-/*
+void print_posorder_avltree (avltree_t node) {
+	if (!node) {
+		// is empty
+		return;
+	}		
+	else {
+		print_posorder_avltree(node->left);
+		print_posorder_avltree(node->right);
+#ifdef DEBUG
+		printf("Index: %d; Height: %d; Data: %d\n", node->index, (int)node->height, (int)node->data);
+#else
+		printf("%d ", (int)node->data);
+#endif
+		return;
+	}
+}
 
-
-
-node_t *find(node_t *root, int val)
-{
-	if (root == NULL) return NULL;
-	if (val < root->val)
-		return find(root->left, val);
-	else if (val > root->val)
-		return find(root->right, val);
+// find
+avltree_t find_index_avltree (avltree_t node, int index) {
+	if (node == NULL)
+		return NULL;
+	if (index < node->index)
+		return find_index_avltree(node->left, index);
+	else if (index > node->index)
+		return find_index_avltree(node->right, index);
 	else
-		return root;
+		return node;
 }
-
-
-
-
-
-// Tests to make sure above code actually works
-
-
-
-int main(int argc, char *argv[])
-{
-	node_t *root = make_node(1, NULL);
-	root = insert(root, 2);
-	root = insert(root, 3);
-	root = insert(root, 4);
-	root = insert(root, 5);
-	
-	print_tree(root);
-	
-	return 0;
-}
-*/
