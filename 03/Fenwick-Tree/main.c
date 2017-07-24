@@ -1,5 +1,6 @@
 // Author: Almir Braggio
 
+#include "src/avl-tree.h"
 #include "src/fenwick-bit.h"
 
 #include <stdio.h>
@@ -28,6 +29,17 @@ int main(int argc, char *argv[]) {
 	int i = 0;
 	int *in1 = (int *)calloc(MAX, sizeof(int));
 
+	avltree_t avl = init_avltree(1, 1);
+
+	for (i = 2; i <= 7; i++) {
+		avl = insert_avltree(avl, i, i);
+	}
+			print_avltree(avl);
+
+
+
+	/*
+
 	// reset srand
 	//srand((unsigned)time(NULL));
 
@@ -48,7 +60,7 @@ int main(int argc, char *argv[]) {
 	}
 
 	// freeee
-	free(in1);
+	free(in1);*/
 	
 	println("Exiting!\r\n");
 	return 0;

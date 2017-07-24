@@ -11,21 +11,17 @@
 #define NULL    (0)
 #endif
 
-#ifndef bool_t
-#define bool_t 	unsigned char
-#define true	1
-#define false	0
-#endif
-
-#define UNUSED(x) (void)(x)
-
+typedef unsigned char byte;
 typedef unsigned int data_t;
-typedef struct bintree_node_t *bintree_t;
+typedef struct avltree_node_t *avltree_t;
 
-struct bintree_node_t {
+struct avltree_node_t {
+	int key;
 	data_t data;
-	bintree_t left, right;
+	byte height;
+	avltree_t left, right, parent;
 };
+
 
 // init
 bintree_t init_bintree (void);

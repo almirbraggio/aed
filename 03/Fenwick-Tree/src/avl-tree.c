@@ -1,0 +1,211 @@
+// Author: Almir Braggio
+
+#include "avl-tree.h"
+
+#include <stdlib.h>
+#include <stdio.h>
+
+// init
+avltree_t init_avltree (int index, unsigned int data) {
+	return make_avltree(NULL, index, data);
+}
+
+// make node
+avltree_t make_avltree (avltree_t parent, int index, unsigned int data) {
+	avltree_t node = (avltree_t)malloc(sizeof(struct avltree_node_t));
+	node->index = index;
+	node->data = data;
+	node->height = 1;
+
+	node->parent = parent;
+	node->left = NULL;
+	node->right = NULL;
+	return node;
+}
+
+// insert content
+avltree_t insert_avltree (avltree_t root, int index, unsigned int data) {
+	avltree_t current = root;
+	while (current->index != index) {
+		// to left
+		if (index < current->index) {
+			if (current->left) {
+				current = current->left;
+			}
+			else {
+				current->left = make_avltree(current, index, data);
+				current = current->left;
+			}
+		}
+		// to right
+		else if (index > current->index) {
+			if (current->right) {
+				current = current->right;
+			}
+			else {
+				current->right = make_avltree(current, index, data);
+				current = current->right;
+			}
+		}
+		// duplicate
+		else return root;
+	}
+	
+	// adjustment
+	do {
+		current  = current->parent;
+		adj_height_avltree(current);
+		current = balance_avltree(current);
+	} while (current->parent);
+	
+	return current;
+}
+
+// to height
+unsigned char max_avltree(unsigned char a, unsigned char b) {
+	return (a > b ? a : b);
+}
+
+unsigned char height_avltree (avltree_t root) {
+	return root ? root->height : 0;
+}
+
+void adj_height_avltree (avltree_t root) {
+	root->height = (unsigned char)(1 + max_avltree(height_avltree(root->left), \
+	height_avltree(root->right)));
+}
+
+// balance
+avltree_t balance_avltree (avltree_t root) {
+	if ((height_avltree(root->left) - height_avltree(root->right)) > 1) {
+		if (height_avltree(root->left->left) > height_avltree(root->left->right)) {
+			// simple rotate to right
+			root = rotate_right_avltree(root);
+		}
+		else {
+			// double rotate left-right
+			rotate_left_avltree(root->left);
+			root = rotate_right_avltree(root);
+		}
+	}
+	else if ((height_avltree(root->right) - height_avltree(root->left)) > 1) {
+		if (height_avltree(root->right->right) > height_avltree(root->right->left)) {
+			// simple rotate to left
+			root = rotate_left_avltree(root);
+		}
+		else {
+			// double rotate right-left
+			rotate_right_avltree(root->right);
+			root = rotate_left_avltree(root);
+		}
+	}
+	return root;
+}
+
+// rotate to right
+avltree_t rotate_right_avltree (avltree_t root) {
+	avltree_t new_root = root->left;
+	if (root->parent) {
+		if (root->parent->left == root)
+			root->parent->left = new_root;
+		else 
+			root->parent->right = new_root;
+	}
+	
+	new_root->parent = root->parent;
+	root->parent = new_root;
+	root->left = new_root->right;
+	
+	if (root->left) 
+		root->left->parent = root;
+	
+	new_root->right = root;
+
+	// fix height
+	adj_height_avltree(root);
+	adj_height_avltree(new_root);
+	return new_root;
+}
+
+// rotate to left
+avltree_t rotate_left_avltree (avltree_t root) {
+	avltree_t new_root = root->right;
+	if (root->parent) {
+		if (root->parent->right == root) 
+			root->parent->right = new_root;
+		else 
+			root->parent->left = new_root;
+	}
+	
+	new_root->parent = root->parent;
+	root->parent = new_root;
+	root->right = new_root->left;
+	
+	if (root->right)
+		root->right->parent = root;
+	
+	new_root->left = root;
+
+	// fix height
+	adj_height_avltree(root);
+	adj_height_avltree(new_root);
+	return new_root;
+}
+
+void print_indent_avltree (avltree_t node, unsigned int indent) {
+	int i = 0;
+	for (i = 0; i < indent; i++)
+		printf(" ");
+	
+	if (!node) {
+		// is empty
+		return;
+	}		
+	else {
+		printf("Index: %d; Height: %d; Data: %d\n", node->index, (int)node->height, (int)node->data);
+		print_indent_avltree(node->left, 2*indent);
+		print_indent_avltree(node->right, 2*indent);
+		return;
+	}
+}
+
+void print_avltree (avltree_t node) {
+	print_indent_avltree(node, 0);
+}
+
+/*
+
+
+
+node_t *find(node_t *root, int val)
+{
+	if (root == NULL) return NULL;
+	if (val < root->val)
+		return find(root->left, val);
+	else if (val > root->val)
+		return find(root->right, val);
+	else
+		return root;
+}
+
+
+
+
+
+// Tests to make sure above code actually works
+
+
+
+int main(int argc, char *argv[])
+{
+	node_t *root = make_node(1, NULL);
+	root = insert(root, 2);
+	root = insert(root, 3);
+	root = insert(root, 4);
+	root = insert(root, 5);
+	
+	print_tree(root);
+	
+	return 0;
+}
+*/
