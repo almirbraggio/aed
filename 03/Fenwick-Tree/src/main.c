@@ -1,7 +1,7 @@
 // Author: Almir Braggio
 
 #include "fenwick-tree.h"
-#include "fenwick-bit.h"
+#include "fenwick-arr.h"
 
 #include <stdio.h>
 #include <stdarg.h>
@@ -40,7 +40,7 @@ int main(int argc, char *argv[]) {
 	input[4] = 15;//52;
 	input[5] = 1;//28;
 	input[6] = 5;//0;
-	init_fwbit(input, 7);
+	init_fwarr(input, 7);
 
 	for (i = 0; i < 7; i++)
 		printf("%d ", input[i]);
