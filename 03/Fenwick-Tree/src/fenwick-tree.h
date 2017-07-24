@@ -3,45 +3,35 @@
 #ifndef FENWICK_TREE_H_INCLUDED
 #define FENWICK_TREE_H_INCLUDED
 
-#include <stdio.h>
-#include <stdlib.h>
+#include "avl-tree.h"
+
+// memcpy
 #include <string.h>
 
-#ifndef NULL
-#define NULL    (0)
-#endif
-
-typedef unsigned char byte;
-typedef unsigned int data_t;
-typedef struct avltree_node_t *avltree_t;
-
-struct avltree_node_t {
-	int key;
-	data_t data;
-	byte height;
-	avltree_t left, right, parent;
-};
-
+typedef avltree_t fwtree_t;
 
 // init
-bintree_t init_bintree (void);
+fwtree_t init_fwtree (int input[], int size);
 
 // free
-bintree_t free_bintree (bintree_t node);
+fwtree_t free_fwtree (fwtree_t node);
 
-// empty
-bool_t isempty_bintree (bintree_t node);
+// get sum
+unsigned int get_sum_to_fwtree (fwtree_t node, int to);
+unsigned int get_sum_from_to_fwtree (fwtree_t node, int from, int to);
 
-// insert
-bintree_t insert_bintree (bintree_t node, data_t data);
+// get diff
+unsigned int get_diff_from_to_fwtree (fwtree_t node, int from, int to);
 
-// search
-data_t min_bintree (bintree_t node);
-data_t max_bintree (bintree_t node);
+// find
+fwtree_t find_index_fwtree (fwtree_t node, int index);
 
 // prints
-void preorder_bintree(bintree_t node);
-void inorder_bintree(bintree_t node);
-void postorder_bintree(bintree_t node);
+void print_preorder_fwtree (fwtree_t node);
+void print_inorder_fwtree (fwtree_t node);
+void print_posorder_fwtree (fwtree_t node);
+
+int min_index_tree (fwtree_t node);
+int max_index_fwtree (fwtree_t node);
 
 #endif

@@ -1,14 +1,13 @@
 // Author: Almir Braggio
 
-#include "src/avl-tree.h"
-#include "src/fenwick-bit.h"
+#include "src/fenwick-tree.h"
 
 #include <stdio.h>
 #include <stdarg.h>
 #include <stdlib.h>
 #include <time.h>
 
-#define MAX		7
+#define MAX		15
 
 // use for check seg faults and memory leaks
 // valgrind --leak-check=full ./bin_tree
@@ -27,40 +26,52 @@ static void println(const char *fmt, ...) {
 // Main code
 int main(int argc, char *argv[]) {
 	int i = 0;
-	int *in1 = (int *)calloc(MAX, sizeof(int));
+	
+	int size = MAX;
+	int *input = (int *)calloc(size, sizeof(int));
 
-	avltree_t avl = init_avltree(1, 1);
-
-	for (i = 2; i <= 7; i++) {
-		avl = insert_avltree(avl, i, i);
-	}
-	print_inorder_avltree(avl);
-
-
-
-	/*
+	fwtree_t tree = NULL;
 
 	// reset srand
-	//srand((unsigned)time(NULL));
+	srand((unsigned)time(NULL));
 
 	printf("Fenwick Tree");
 
 	println("Input data: ");
 	// fill array with random data
-	for (i = 0; i < MAX; i++) {
-		in1[i] = rand() % MAX;
-		printf("%d ", in1[i]);
+	for (i = 0; i < size; i++) {
+		input[i] = rand() % size;
+		printf("%d ", input[i]);
 	}
 
-	init_fwbit(in1, MAX);
+	// init fenwick tree
+	tree = init_fwtree(input, size);
 
-	println("Fenwick bit: ");
-	for (i = 0; i < MAX; i++) {
-		printf("%d ", in1[i]);
-	}
+	// prints
+	/*println("Pre-Order: ");
+	print_preorder_fwtree(tree);
+
+	println("In-Order: ");
+	print_inorder_fwtree(tree);
+
+	println("Pos-Order: ");
+	print_posorder_fwtree(tree);*/
+
+	println("Prefix Sum: ");
+	for (i = 0; i < size; i++)
+		printf("%d ", get_sum_to_fwtree(tree, i));
+	
+	println("Interval Sum: ");
+	for (i = 0; i < size; i++)
+		printf("%d ", get_sum_from_to_fwtree(tree, 0, i));
+
+	println("Interval Diff: ");
+	for (i = 0; i < size; i++)
+		printf("%d ", get_diff_from_to_fwtree(tree, i-1, i));
 
 	// freeee
-	free(in1);*/
+	free(input);
+	free(tree);
 	
 	println("Exiting!\r\n");
 	return 0;

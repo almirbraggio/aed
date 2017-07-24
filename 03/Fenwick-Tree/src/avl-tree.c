@@ -8,8 +8,8 @@
 //#define DEBUG
 
 // init
-avltree_t init_avltree (int index, unsigned int data) {
-	return make_avltree(NULL, index, data);
+avltree_t init_avltree (void) { //int index, unsigned int data) {
+	return NULL; //make_avltree(NULL, index, data);
 }
 
 // make node
@@ -28,6 +28,12 @@ avltree_t make_avltree (avltree_t parent, int index, unsigned int data) {
 // insert content
 avltree_t insert_avltree (avltree_t root, int index, unsigned int data) {
 	avltree_t current = root;
+
+	if (current == NULL) {
+		current = make_avltree(NULL, index, data);
+		return current;
+	}
+
 	while (current->index != index) {
 		// to left
 		if (index < current->index) {

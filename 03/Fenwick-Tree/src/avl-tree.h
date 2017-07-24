@@ -20,7 +20,7 @@ struct avltree_node_t {
 };
 
 // init and make
-avltree_t init_avltree (int index, unsigned int data);
+avltree_t init_avltree (void); //int index, unsigned int data);
 avltree_t make_avltree (avltree_t parent, int index, unsigned int data);
 
 // insert
