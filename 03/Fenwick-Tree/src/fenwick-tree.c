@@ -8,7 +8,7 @@ fwtree_t init_fwtree (void) {
 }
 
 // make node
-fwtree_t make_fwtree (fwtree_t parent, int index, unsigned int data) {
+fwtree_t make_fwtree (fwtree_t parent, long int index, unsigned long int data) {
 	fwtree_t node = (fwtree_t)malloc(sizeof(struct fwtree_node_t));
 	node->index = index;
 	node->data = data;
@@ -31,7 +31,7 @@ fwtree_t free_fwtree (fwtree_t node) {
 }
 
 // insert content
-fwtree_t insert_fwtree (fwtree_t root, int index, unsigned int data) {
+fwtree_t insert_fwtree (fwtree_t root, long int index, unsigned long int data) {
 	fwtree_t current = root;
 
 	if (isempty_fwtree(current)) {
@@ -201,14 +201,14 @@ bool_t isleaf_fwtree (fwtree_t node) {
 }
 
 // min, max
-int min_index_tree (fwtree_t node) {
+long int min_index_tree (fwtree_t node) {
 	fwtree_t r = node;
 	while (r->left != NULL)
 		r =  r->left;
 	return r->index;
 }
 
-int max_index_fwtree (fwtree_t node) {
+long int max_index_fwtree (fwtree_t node) {
 	fwtree_t r = node;
 	while (r->right != NULL)
 		r =  r->right;
@@ -216,7 +216,7 @@ int max_index_fwtree (fwtree_t node) {
 }
 
 // get prefix sum
-unsigned int sum_to_fwtree (fwtree_t node, int to) {
+unsigned long int sum_to_fwtree (fwtree_t node, long int to) {
 	if (node == NULL)
 		return 0;
 	if (to < node->index)
@@ -227,17 +227,17 @@ unsigned int sum_to_fwtree (fwtree_t node, int to) {
 }
 
 // get interval sum
-unsigned int sum_from_to_fwtree (fwtree_t node, int from, int to) {
+unsigned long int sum_from_to_fwtree (fwtree_t node, long int from, long int to) {
 	return (sum_to_fwtree (node, min_index_tree(node)) + sum_to_fwtree (node, to) - sum_to_fwtree (node, from)); 
 }
 
 // get prefix diff
-unsigned int diff_to_fwtree (fwtree_t node, int to) {
+unsigned long int diff_to_fwtree (fwtree_t node, long int to) {
 	return (sum_to_fwtree (node, to) - sum_to_fwtree (node, min_index_tree(node)));
 }
 
 // get interval diff
-unsigned int diff_from_to_fwtree (fwtree_t node, int from, int to) {
+unsigned long int diff_from_to_fwtree (fwtree_t node, long int from, long int to) {
 	return (sum_to_fwtree (node, to) - sum_to_fwtree (node, from)); 
 }
 
@@ -282,23 +282,3 @@ void print_posorder_fwtree (fwtree_t node) {
 	}
 	return;
 }
-
-/*
-// find
-fwtree_t find_index_fwtree (fwtree_t node, int index) {
-	return find_index_avltree(node, index);
-}
-
-
-
-// find
-avltree_t find_index_avltree (avltree_t node, int index) {
-	if (node == NULL)
-		return NULL;
-	if (index < node->index)
-		return find_index_avltree(node->left, index);
-	else if (index > node->index)
-		return find_index_avltree(node->right, index);
-	else
-		return node;
-}*/

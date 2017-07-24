@@ -1,19 +1,18 @@
 // Author: Almir Braggio
 
 #include "fenwick-tree.h"
-#include "fenwick-arr.h"
 
 #include <stdio.h>
 #include <stdarg.h>
 #include <stdlib.h>
 #include <time.h>
 
-#define MAX		7
+//#define PRINT
 
 // use for check seg faults and memory leaks
 // valgrind --leak-check=full ./bin_tree
 
-static void println(const char *fmt, ...) {
+static void println (const char *fmt, ...) {
 	va_list argp;
 	
 	fputc('\n', stdout);
@@ -25,76 +24,88 @@ static void println(const char *fmt, ...) {
 }
 
 // Main code
-int main(int argc, char *argv[]) {
-	int i = 0;
+int main (int argc, char *argv[]) {
+	long int i = 0, j = 0;
 	
-	int size = MAX;
-	int *input = (int *)calloc(size, sizeof(int));
+	// Argument validation	
+	if ((argc >> 1) == 0) {
+		printf("Invalid arguments.\r\nYou must specify one argument.\r\n");
+		return 0;
+	}
 
-	//int arr[7] = {5, 1, 15, 11, 52, 28, 0};
-
-	input[0] = 0;//5;
-	input[1] = 28;//1;
-	input[2] = 52;//15;
-	input[3] = 11;
-	input[4] = 15;//52;
-	input[5] = 1;//28;
-	input[6] = 5;//0;
-	init_fwarr(input, 7);
-
-	for (i = 0; i < 7; i++)
-		printf("%d ", input[i]);
-
-	//return 0;
+	long int size = atoi(argv[1]);
+	unsigned long int *input = (unsigned long int *)calloc(size, sizeof(unsigned long int));
+	long int ta = 0, tb = 0;
+	long int to = 0, sum = 0;
 
 	// init fenwick tree
+#ifdef PRINT	
 	printf("Initializing Fenwick Tree...");
+#endif
 	fwtree_t tree = init_fwtree();
-
-	/*// reset srand
+	
+	// reset srand
 	srand((unsigned)time(NULL));
 
-	println("Input data: ");
+#ifdef PRINT
+	println("Input data: \t");
+#endif
 	// fill array with random data
+	ta = clock();
 	for (i = 0; i < size; i++) {
 		input[i] = rand() % size;
+#ifdef PRINT
 		printf("%d ", input[i]);
-	}*/
+#endif
+	}
+	ta = (clock() - ta);
 
-	//for (i = 1; i < 8; i++)
-	//	tree = insert_fwtree(tree, i, arr[i-1]);
-	
-	tree = insert_fwtree(tree, 0, 0);
-	tree = insert_fwtree(tree, 1, 28);
-	tree = insert_fwtree(tree, 2, 52);
-	tree = insert_fwtree(tree, 3, 11);
-	tree = insert_fwtree(tree, 4, 15);
-	tree = insert_fwtree(tree, 5, 1);
-	tree = insert_fwtree(tree, 6, 5);	
+	tb = clock();
+	// generate fenwick tree
+	for (i = 0; i < size; i++) {
+		tree = insert_fwtree(tree, i, input[i]);
+	}
+	tb = (clock() - tb);
 
-	// print
-	println("\r\n");
+
+	println("%*s\t%*s\t%*s", 12, "t1", 12, "t2", 12, "t1/t2");
+	println("%*.lf\t%*.lf\t%*.4lf\r\n", 12, (double)ta, 12, (double)tb, 12, (double)ta/(double)tb);
+
+	// print tree
+#ifdef PRINT
+	println("Fenwick Tree: \t");
 	print_inorder_fwtree(tree);
+#endif	
 
-	println("Prefix Sum: ");
-	for (i = 0; i < size; i++)
-		printf("%d ", sum_to_fwtree(tree, i));
-	
-	println("Interval Sum: ");
-	for (i = 0; i < size; i++)
-		printf("%d ", sum_from_to_fwtree(tree, 0, i));
+	println("%*s\t%*s\t%*s\t%*s\t%*s\t%*s", 16, "index", 16, "array", 16, "tree", 8, "t1", 8, "t2", 16, "t1/t2");
+	for(i = 0; i < 10; i++) {
+		
+		to = (size / 10) * i;
+		println("%*ld\t", 16, to);
+		
+		ta = clock();
+		sum = 0;
+		for (j = 0; j <= to; j++)
+			sum = sum + input[j];
+		printf("%*ld\t", 16, sum);
+		ta = (clock() - ta);
 
-	println("Interval Diff: ");
-	for (i = 0; i < size; i++)
-		printf("%d ", diff_from_to_fwtree(tree, i-1, i));
+		tb = clock();
+		printf("%*ld\t", 16, sum_from_to_fwtree(tree, 0, to));
+		tb = (clock() - tb);
+
+		printf("%*.lf\t%*.lf\t%*.4lf", 8, (double)ta, 8, (double)tb, 16, (double)ta/(double)tb);
+	}
+	println("\r\n");
 
 	// freeee
 	free(input);
 	
 	tree = free_fwtree(tree);
+#ifdef PRINT
 	if (isempty_fwtree(tree))
 		println("Freeee!");
-	
 	println("Exiting!\r\n");
+#endif
 	return 0;
 }
