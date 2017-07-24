@@ -1,6 +1,6 @@
 // Author: Almir Braggio
 
-#include "src/fenwick-tree.h"
+#include "fenwick-tree.h"
 
 #include <stdio.h>
 #include <stdarg.h>
