@@ -23,9 +23,12 @@ btree_t* insert_btree (btree_t *r, uint info, btree_data_t *data) {
 		insere_aux(r, info, data);
 		if(overflow(r)) {
 			int m;
-			btree_t* x = split(r, &m);
+			btree_data_t * n = malloc(sizeof(btree_data_t));
+			
+			btree_t* x = split(r, &m, n);
 			btree_t* novaRaiz = malloc(sizeof(btree_t));
 			novaRaiz->keys[0] = m;
+			memcpy(&(novaRaiz->datas[0]), n, sizeof(btree_data_t));
 			novaRaiz->p[0] = r;
 			novaRaiz->p[1] = x;
 			novaRaiz->n = 1;
@@ -44,7 +47,7 @@ void insere_aux(btree_t* r, uint info, btree_data_t *data) {
       	insere_aux(r->p[pos], info, data);
       	if(overflow(r->p[pos])){
 			int m; // valor da chave mediana
-			btree_t* aux = split(r->p[pos], &m);
+			btree_t* aux = split(r->p[pos], &m, data);
 			adicionaDireita(r, pos, m, aux, data);
 		}
 	}
@@ -73,23 +76,30 @@ int buscaPos(btree_t* r, int info, int * pos) {
 	return 0; // chave não está neste nó
 }
 
-btree_t* split(btree_t* x, int * m) {
+btree_t* split(btree_t* x, int * m, btree_data_t * n) {
 	btree_t* y = (btree_t*) malloc(sizeof(btree_t));
 	int q = x->n/2;
 	y->n = x->n - q - 1;
 	x->n = q;
+
 	*m = x->keys[q]; // chave mediana
+
+	// TODO Rever aqui!
+	memcpy(n, &x->datas[q], sizeof(btree_data_t));
+	//memcpy(&n, &x->datas[q], sizeof(btree_data_t));
+
 	int i = 0;
 	y->p[0] = x->p[q+1];
 	for(i = 0; i < y->n; i++){
 		y->keys[i] = x->keys[q+i+1];
+		y->datas[i] = x->datas[q+i+1];
 		y->p[i+1] = x->p[q+i+2];
 	}
 	return y;
 }
 
 bool_t overflow(btree_t *r) {
-	if ( r->n >= M ) {
+	if ( r->n >= (M - 1) ) {
 		return true;
 	}
 	return false;
@@ -157,7 +167,7 @@ void inorder_btree (btree_t *node) {
 		for (int i=0; i < node->n; i++) {
 			inorder_btree(node->p[i]);
 			printf("%d ", (int)(node->keys[i]));
-			//printf("%s ", node->datas[i].name);
+			printf("%s ", node->datas[i].name);
 		}
 		inorder_btree(node->p[node->n]);
 	}

@@ -12,7 +12,7 @@
 
 // ---
 
-#define M 	2
+#define M 	4
 
 typedef unsigned int uint;
 typedef enum key_status key_status_t;
@@ -56,7 +56,7 @@ btree_t *init_btree (void);
 btree_t* insert_btree (btree_t *r, uint info, btree_data_t *data);
 void adicionaDireita(btree_t* r, int pos, int k, btree_t* p, btree_data_t *data);
 void insere_aux(btree_t* r, uint info, btree_data_t *data);
-btree_t* split(btree_t* x, int * m);
+btree_t* split(btree_t* x, int * m, btree_data_t * n);
 
 // remove
 bool_t remove_btree (btree_t **node, uint key);
