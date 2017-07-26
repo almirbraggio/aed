@@ -106,13 +106,13 @@ Iniciando em (1). Incrementar em 5:
 Caminha em direção a raiz, se for um filho da esquerda, incrementa também o pai:
 
 4 (32)
-2 (6+5)            6 (80)
+2 (6)              6 (80)
 1 (5+5)  3 (15)    5 (52)    7 (0)
 
 Novamente, se for um filho da esquerda, incrementa:
 
 4 (32+5)
-2 (6+5)            6 (80)
+2 (6)              6 (80)
 1 (5+5)  3 (15)    5 (52)    7 (0)
 
 A nova árvore, portanto:
