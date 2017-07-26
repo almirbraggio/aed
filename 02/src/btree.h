@@ -1,18 +1,18 @@
-// Author: Almir Braggio
-// jul. 2017
-
 #ifndef BTREE_H_INCLUDED
 #define BTREE_H_INCLUDED
 
 #include "useful.h"
 
 #include <stdio.h>
+#include <stdarg.h>
 #include <stdlib.h>
 #include <string.h>
 
 // ---
 
-#define M 	4
+#define ORDEM 	3
+
+#define M ORDEM+1
 
 typedef unsigned int uint;
 typedef enum key_status key_status_t;
@@ -27,14 +27,14 @@ typedef struct btree_data {
 	char cel[16];
 	char email[32];
 	char address[32];
-	char birthday[8];
+	char birthday[16];
 } btree_data_t;
 
 typedef struct btree_node_t {
     uint n; 						// keys in node
     uint keys[M-1]; 				// array of keys
 	btree_data_t datas[M-1];		// data array of the keys
-    struct btree_node_t *p[M]; 		// pointers will be in use
+	struct btree_node_t *p[M]; 		// pointers will be in use
 } btree_t;
 
 enum key_status {
@@ -69,17 +69,21 @@ bool_t search_key_btree (btree_t *node, uint key);
 int search_pos_btree (uint key, uint *key_arr, uint n);
 
 // empty or leaf
+int eh_folha(btree_t* r);
 bool_t isempty_btree (btree_t *node);
 bool_t isleaf_btree (btree_t *node);
 bool_t overflow(btree_t *r);
 
 // prints
 void inorder_btree (btree_t *node);
-void printall_btree (btree_t *node, int tabs);
+void printall_btree (btree_t *node);
+void printLevelOrder(btree_t *root);
+void printGivenLevel(btree_t* root, int level);
 
 // min, max and total
 uint min_btree (btree_t *node);
 uint max_btree (btree_t *node);
 int total_btree (btree_t *node);
+int btree_height (btree_t *node);
 
 #endif

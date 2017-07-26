@@ -1,6 +1,3 @@
-// Author: Almir Braggio
-// jul. 2017
-
 #include "btree.h"
 
 // init
@@ -40,17 +37,23 @@ btree_t* insert_btree (btree_t *r, uint info, btree_data_t *data) {
 
 void insere_aux(btree_t* r, uint info, btree_data_t *data) {
 	int pos;
-	if(!buscaPos(r, info, &pos)){ // chave não está no nó r if(eh_folha(r)) {
-		adicionaDireita(r, pos, info, NULL, data);
-    }
-    else {
-      	insere_aux(r->p[pos], info, data);
-      	if(overflow(r->p[pos])){
-			int m; // valor da chave mediana
-			btree_t* aux = split(r->p[pos], &m, data);
-			adicionaDireita(r, pos, m, aux, data);
+	if(!buscaPos(r, info, &pos)){ // chave não está no nó r
+		if(eh_folha(r)) {
+			adicionaDireita(r, pos, info, NULL, data);
+    	}
+    	else {
+      		insere_aux(r->p[pos], info, data);
+      		if(overflow(r->p[pos])){
+				int m; // valor da chave mediana
+				btree_t* aux = split(r->p[pos], &m, data);
+				adicionaDireita(r, pos, m, aux, data);
+			}
 		}
 	}
+}
+
+int eh_folha(btree_t* r) {
+  	return (r->p[0] == NULL);
 }
 
 void adicionaDireita(btree_t* r, int pos, int k, btree_t* p, btree_data_t *data) {
@@ -66,7 +69,8 @@ void adicionaDireita(btree_t* r, int pos, int k, btree_t* p, btree_data_t *data)
 	r->n++;
 }
 
-// busca a posição em que a chave info está ou estaria em um no ́ // retorna 1 se a chave esta ́ presente ou 0 caso contr ́ario
+// busca a posição em que a chave info está ou estaria em um nó
+// retorna 1 se a chave está presente ou 0 caso contrário
 int buscaPos(btree_t* r, int info, int * pos) {
   	for((*pos)=0; (*pos) < r->n; (*pos)++)
 		if(info == r->keys[(*pos)])
@@ -84,9 +88,7 @@ btree_t* split(btree_t* x, int * m, btree_data_t * n) {
 
 	*m = x->keys[q]; // chave mediana
 
-	// TODO Rever aqui!
 	memcpy(n, &x->datas[q], sizeof(btree_data_t));
-	//memcpy(&n, &x->datas[q], sizeof(btree_data_t));
 
 	int i = 0;
 	y->p[0] = x->p[q+1];
@@ -99,7 +101,7 @@ btree_t* split(btree_t* x, int * m, btree_data_t * n) {
 }
 
 bool_t overflow(btree_t *r) {
-	if ( r->n >= (M - 1) ) {
+	if ( r->n >= ORDEM ) {
 		return true;
 	}
 	return false;
@@ -118,7 +120,7 @@ btree_t *search_btree (btree_t *node, uint key, int *pos) {
 		return search_btree(node->p[n], key, pos);
 	
 	// return position and node
-	*pos = n;
+	memcpy(pos, &n, sizeof(int));
 	return node;
 }
 
@@ -166,28 +168,48 @@ void inorder_btree (btree_t *node) {
 	if (!isempty_btree(node)) {
 		for (int i=0; i < node->n; i++) {
 			inorder_btree(node->p[i]);
-			printf("%d ", (int)(node->keys[i]));
+			printf("%d-", (int)(node->keys[i]));
 			printf("%s ", node->datas[i].name);
+			printf("\n");
 		}
 		inorder_btree(node->p[node->n]);
 	}
 }
 
-// print all btree
-void printall_btree (btree_t *node, int tabs) {
-	int i;
-	if (!isempty_btree(node)) {
-		for(i = 1; i <= tabs; i++) {
-			printf("\t");
+/* Function to line by line print level order traversal a tree*/
+void printLevelOrder(btree_t *root) {
+    int h = btree_height(root);
+    int i;
+    for (i=0; i<=h; i++)
+    {
+        printGivenLevel(root, i);
+        printf("\n");
+    }
+}
+
+/* Print nodes at a given level */
+void printGivenLevel(btree_t* root, int level) {
+    if (root == NULL)
+        return;
+    if (level == 0) {
+		printf("[");
+		for (int i=0; i < root->n; i++) {
+			printf(" %d ", root->keys[i]);
 		}
-		for (i = 0; i < (node->n); i++) {
-			printf("%d ",node->keys[i]);
-		}
-		printf("\n");
-		for (i=0; i <= (node->n); i++) {
-			printall_btree(node->p[i], tabs+1);
-		}
+		printf("] ");
 	}
+    else if (level > 0) {
+		for (int i = 0; i < root->n + 1; i++) {
+			printGivenLevel(root->p[i], level-1);
+		}
+    }
+}
+
+int btree_height (btree_t *node) {
+	if (node == NULL) {
+		return -1;
+	}
+	return 1 + btree_height(node->p[0]);
 }
 
 // total keys

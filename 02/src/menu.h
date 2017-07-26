@@ -2,6 +2,10 @@
 #define MENU_H
 
 #include "btree.h"
+#include <stdio.h>
+#include <stdarg.h>
+#include <stdlib.h>
+#include <string.h>
 
 /*
  * Enum for the menu options
@@ -12,6 +16,7 @@ typedef enum menu_option {
 	Search_Student,
 	Remove_Student,
 	Print_Student,
+	Read_File,
     Menu_Exit,
     Menu_Error
 } menu_option_t;
@@ -22,23 +27,28 @@ typedef enum menu_option {
 menu_option_t print_menu(void);
 
 /*
- * Add new student
+ * Show menu for new student id
  */
-btree_t *add_student(uint *key);
+uint enter_student_id_menu(void);
 
 /*
- * Update student info
+ * Show menu for new student data
  */
-void *update_student(void);
+btree_data_t *enter_student_data_menu(void);
 
 /*
  * Search student
  */
-btree_t *search_student(void);
+void search_student(btree_t* root);
 
 /*
  * Print all students
  */
-void print_students(void);
+void print_students(btree_t * root);
+
+/*
+ * Read students from file
+ */
+btree_t *  read_students_file(btree_t * root);
 
 #endif
