@@ -215,6 +215,18 @@ long int max_index_fwtree (fwtree_t node) {
 	return r->index;
 }
 
+// find
+fwtree_t find_index_fwtree (fwtree_t node, long int index) {
+	if (node == NULL)
+		return NULL;
+	if (index < node->index)
+		return find_index_fwtree(node->left, index);
+	else if (index > node->index)
+		return find_index_fwtree(node->right, index);
+	else
+		return node;
+}
+
 // get prefix sum
 unsigned long int sum_to_fwtree (fwtree_t node, long int to) {
 	if (node == NULL)

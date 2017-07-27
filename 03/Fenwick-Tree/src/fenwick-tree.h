@@ -56,6 +56,9 @@ bool_t isleaf_fwtree (fwtree_t node);
 long int min_index_tree (fwtree_t node);
 long int max_index_fwtree (fwtree_t node);
 
+// find
+fwtree_t find_index_fwtree (fwtree_t node, long int index);
+
 // sum
 unsigned long int sum_to_fwtree (fwtree_t node, long int to);
 unsigned long int sum_from_to_fwtree (fwtree_t node, long int from, long int to);
